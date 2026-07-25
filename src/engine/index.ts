@@ -5,14 +5,18 @@
  */
 
 export {
+  cloneBoard,
   createEmptyBoard,
   getEmptyCells,
-  shiftRowLeft,
   spawnTile,
 } from './boardUtils';
 
-export { resolveMove, rotateBoard } from './moveResolver';
+export { normalizeRotations, rotateBoard, rotateIndex } from './boardRotator';
 
-export { calculateMergeBonuses, scoreFromMerge } from './scoreCalculator';
+export { shiftRowLeft } from './rowShifter';
+
+export { resolveMove } from './moveResolver';
+
+export { calculateMergeScore, scoreFromMerge } from './scoreCalculator';
 
 export { isLost, isWon } from './winCondition';

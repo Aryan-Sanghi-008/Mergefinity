@@ -4,15 +4,15 @@
  * @description Unit tests for merge score helpers.
  */
 
-import { calculateMergeBonuses, scoreFromMerge } from './scoreCalculator';
+import { calculateMergeScore, scoreFromMerge } from './scoreCalculator';
 
-describe('calculateMergeBonuses', () => {
+describe('calculateMergeScore', () => {
   it('sums merge values', () => {
-    expect(calculateMergeBonuses([4, 8, 16])).toBe(28);
+    expect(calculateMergeScore([4, 8, 16])).toBe(28);
   });
 
   it('returns 0 for an empty list', () => {
-    expect(calculateMergeBonuses([])).toBe(0);
+    expect(calculateMergeScore([])).toBe(0);
   });
 });
 

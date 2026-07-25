@@ -252,10 +252,10 @@ src/engine/winCondition.test.ts
 
 ### Definition of Done
 
-- [ ] `npx jest --coverage` shows 100% statement coverage on all engine files
-- [ ] No import from React, Reanimated, Zustand, or any RN module anywhere in `engine/`
-- [ ] `resolveMove(board, 'LEFT')` and `resolveMove(rotated, 'RIGHT')` produce identical boards for a symmetric position
-- [ ] Engine runs in bare Node via `ts-node` with no special setup
+- [x] `npx jest --coverage` shows 100% statement coverage on all engine files
+- [x] No import from React, Reanimated, Zustand, or any RN module anywhere in `engine/`
+- [x] `resolveMove(board, 'LEFT')` and `resolveMove(rotated, 'RIGHT')` produce identical boards for a symmetric position
+- [x] Engine runs in bare Node via `ts-node` with no special setup (`npm run engine:smoke`)
 
 ---
 

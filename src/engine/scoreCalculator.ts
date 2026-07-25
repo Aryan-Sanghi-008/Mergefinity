@@ -8,11 +8,11 @@ import type { CellValue } from '@/types';
 
 /**
  * Sums merged tile values into a score bonus.
- * @param merges - Values of tiles produced by merges
+ * @param mergedValues - Values of tiles produced by merges
  * @returns Total score points to add
  */
-export function calculateMergeBonuses(merges: readonly CellValue[]): number {
-  return merges.reduce<number>((sum, value) => sum + value, 0);
+export function calculateMergeScore(mergedValues: readonly CellValue[]): number {
+  return mergedValues.reduce<number>((sum, value) => sum + value, 0);
 }
 
 /**

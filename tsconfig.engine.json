@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": [
+    "scripts/engine-smoke.ts",
+    "src/engine/**/*.ts",
+    "src/constants/**/*.ts",
+    "src/types/**/*.ts"
+  ],
+  "exclude": ["src/engine/**/*.test.ts"]
+}

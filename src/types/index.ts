@@ -15,7 +15,7 @@ export type {
   TileMove,
 } from './game.types';
 
-export type { ShiftRowResult } from './board.types';
+export type { RowTileMove, ShiftRowResult } from './board.types';
 
 export type {
   GameActions,

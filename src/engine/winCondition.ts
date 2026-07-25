@@ -10,11 +10,11 @@ import type { Board } from '@/types';
 import { getEmptyCells } from './boardUtils';
 
 /**
- * Returns true when any cell has reached WIN_VALUE.
+ * Returns true when any cell has reached or exceeded WIN_VALUE.
  * @param board - Current board
  */
 export function isWon(board: Readonly<Board>): boolean {
-  return board.some((value) => value === WIN_VALUE);
+  return board.some((value) => value >= WIN_VALUE);
 }
 
 /**

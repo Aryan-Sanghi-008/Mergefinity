@@ -9,7 +9,6 @@ import type { Board, CellValue } from '@/types';
 import { createEmptyBoard } from './boardUtils';
 import { isLost, isWon } from './winCondition';
 
-
 describe('isWon', () => {
   it('returns false when WIN_VALUE is absent', () => {
     const board = createEmptyBoard();
@@ -20,6 +19,12 @@ describe('isWon', () => {
   it('returns true when a cell is 2048', () => {
     const board = createEmptyBoard();
     board[7] = 2048;
+    expect(isWon(board)).toBe(true);
+  });
+
+  it('returns true when a cell exceeds WIN_VALUE', () => {
+    const board = createEmptyBoard();
+    board[0] = 4096;
     expect(isWon(board)).toBe(true);
   });
 });
@@ -35,7 +40,6 @@ describe('isLost', () => {
     const board = Array.from({ length: 16 }, (_, i) =>
       i % 2 === 0 ? (2 as CellValue) : (4 as CellValue),
     ) as Board;
-    // force one pair of equals horizontally in row 0
     board[0] = 2;
     board[1] = 2;
     board[2] = 4;

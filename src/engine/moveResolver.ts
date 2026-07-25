@@ -1,60 +1,55 @@
 /**
  * @file moveResolver.ts
  * @layer engine
- * @description Pure function that resolves a swipe direction into a new board state
- *              via rotation + left-shift. No React, no side effects, no async.
+ * @description Resolves a swipe via rotation + left-shift. Pure TypeScript only.
  */
 
 import { BOARD_SIZE, DIR_ROTATIONS, QUARTER_TURNS } from '@/constants';
-import type { Board, CellValue, Direction, MoveResult } from '@/types';
+import type { Board, CellValue, Direction, MoveResult, TileMove } from '@/types';
 
-import { shiftRowLeft } from './boardUtils';
-
-/**
- * Rotates the board 90° clockwise `times` times.
- * @param board - Source board
- * @param times - Number of 90° clockwise rotations
- * @returns Newly allocated rotated board
- */
-export function rotateBoard(board: Readonly<Board>, times: number): Board {
-  let current = [...board] as Board;
-  const rotations = ((times % QUARTER_TURNS) + QUARTER_TURNS) % QUARTER_TURNS;
-
-  for (let t = 0; t < rotations; t += 1) {
-    const rotated = Array.from({ length: BOARD_SIZE * BOARD_SIZE }, () => 0 as CellValue);
-    for (let row = 0; row < BOARD_SIZE; row += 1) {
-      for (let col = 0; col < BOARD_SIZE; col += 1) {
-        const source = current[(BOARD_SIZE - 1 - col) * BOARD_SIZE + row];
-        rotated[row * BOARD_SIZE + col] = source ?? 0;
-      }
-    }
-    current = rotated;
-  }
-
-  return current;
-}
+import { rotateBoard, rotateIndex } from './boardRotator';
+import { shiftRowLeft } from './rowShifter';
 
 /**
  * Resolves a swipe in the given direction.
  * @param board - Current board (read-only)
  * @param dir - Player's swipe direction
- * @returns MoveResult with new board, score delta, and whether the board changed
+ * @returns MoveResult with board, score delta, tileMoves, and boardChanged
  */
 export function resolveMove(board: Readonly<Board>, dir: Direction): MoveResult {
   const rotations = DIR_ROTATIONS[dir];
   const pre = rotations[0];
   const post = rotations[1];
+  const inversePre = normalizeInverse(pre);
 
   const rotated = rotateBoard(board, pre);
 
   let delta = 0;
   const shifted: CellValue[] = [];
+  const tileMoves: TileMove[] = [];
 
-  for (let rowStart = 0; rowStart < rotated.length; rowStart += BOARD_SIZE) {
-    const row = rotated.slice(rowStart, rowStart + BOARD_SIZE) as CellValue[];
-    const { row: nextRow, delta: rowDelta } = shiftRowLeft(row);
+  for (let row = 0; row < BOARD_SIZE; row += 1) {
+    const rowStart = row * BOARD_SIZE;
+    const rowValues = rotated.slice(rowStart, rowStart + BOARD_SIZE) as CellValue[];
+    const { row: nextRow, delta: rowDelta, moves } = shiftRowLeft(rowValues);
     delta += rowDelta;
     shifted.push(...nextRow);
+
+    for (const move of moves) {
+      if (move.fromCol === move.toCol && !move.merged) {
+        continue;
+      }
+
+      const fromRotated = rowStart + move.fromCol;
+      const toRotated = rowStart + move.toCol;
+
+      tileMoves.push({
+        from: rotateIndex(fromRotated, inversePre),
+        to: rotateIndex(toRotated, post),
+        value: move.value,
+        merged: move.merged,
+      });
+    }
   }
 
   const result = rotateBoard(shifted as Board, post);
@@ -63,7 +58,17 @@ export function resolveMove(board: Readonly<Board>, dir: Direction): MoveResult 
   return {
     board: result,
     scoreDelta: delta,
-    tileMoves: [],
+    tileMoves: boardChanged ? tileMoves : [],
     boardChanged,
   };
 }
+
+/**
+ * Inverse of `pre` clockwise rotations (for mapping rotated indices back).
+ */
+function normalizeInverse(pre: number): number {
+  return (QUARTER_TURNS - (pre % QUARTER_TURNS)) % QUARTER_TURNS;
+}
+
+/** Re-export rotator for callers that imported from moveResolver historically. */
+export { rotateBoard } from './boardRotator';
