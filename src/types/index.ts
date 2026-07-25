@@ -45,7 +45,13 @@ export type {
   AchievementStatus,
 } from './achievement.types';
 
-export type { GameStats, LifetimeStats, SessionRecord } from './stats.types';
+export type {
+  GameEndOutcome,
+  GameStats,
+  LifetimeStats,
+  RecordGameEndPayload,
+  SessionRecord,
+} from './stats.types';
 
 export type {
   BoardTileEntity,

@@ -16,11 +16,17 @@ export type { ControlBarProps } from './ControlBar';
 export { GameOverOverlay } from './GameOverOverlay';
 export type { GameOverOverlayProps } from './GameOverOverlay';
 
+export { MergeBar } from './MergeBar';
+export type { MergeBarProps } from './MergeBar';
+
 export { ModeSelector } from './ModeSelector';
 export type { ModeSelectorProps } from './ModeSelector';
 
 export { ScorePanel } from './ScorePanel';
 export type { ScorePanelProps } from './ScorePanel';
+
+export { SessionCard } from './SessionCard';
+export type { SessionCardProps } from './SessionCard';
 
 export { SettingsToggleRow } from './SettingsToggleRow';
 export type { SettingsToggleRowProps } from './SettingsToggleRow';

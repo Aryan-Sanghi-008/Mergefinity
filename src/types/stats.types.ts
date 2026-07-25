@@ -45,6 +45,10 @@ export interface LifetimeStats {
   /** Longest consecutive play days. */
   longestPlayStreakDays: number;
   /**
+   * Last calendar day a game was recorded (`YYYY-MM-DD` local), or `null`.
+   */
+  lastPlayDayKey: string | null;
+  /**
    * Merge histogram: how many times each tile value was created.
    * Keys are CellValue powers of two from 2 upward.
    */
@@ -63,4 +67,21 @@ export interface SessionRecord {
   durationSeconds: number;
   /** Epoch ms end (or save) time. */
   endedAt: number;
+}
+
+/** Terminal outcome for a recorded session. */
+export type GameEndOutcome = 'win' | 'loss';
+
+/** Payload for recording a finished game into stats. */
+export interface RecordGameEndPayload {
+  /** Mode that was played. */
+  mode: GameMode;
+  /** Win or loss. */
+  outcome: GameEndOutcome;
+  /** Final score. */
+  score: number;
+  /** Highest tile on the board at end. */
+  bestTile: CellValue;
+  /** Elapsed session duration in seconds. */
+  durationSeconds: number;
 }

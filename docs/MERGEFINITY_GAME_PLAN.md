@@ -624,9 +624,9 @@ src/components/molecules/MergeBar.tsx
 
 ### Definition of Done
 
-- [ ] Statistics update correctly after every game, including when the app is killed mid-update
-- [ ] Win rate % is accurate to the nearest integer across 50 simulated games
-- [ ] Reset statistics leaves all gameplay (board, best score) intact and only clears stats records
+- [x] Statistics update correctly after every game, including when the app is killed mid-update
+- [x] Win rate % is accurate to the nearest integer across 50 simulated games
+- [x] Reset statistics leaves all gameplay (board, best score) intact and only clears stats records
 
 ---
 

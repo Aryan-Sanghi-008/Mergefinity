@@ -1,29 +1,32 @@
 /**
  * @file settings.tsx
  * @layer app
- * @description Settings — gameplay haptics toggle (P-08) + theme lab link.
+ * @description Settings — haptics, theme lab, reset statistics (P-08 / P-11).
  */
 
 import { Link } from 'expo-router';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { SettingsToggleRow } from '@/components/molecules';
+import { ConfirmDialog, SettingsToggleRow } from '@/components/molecules';
 import { STRINGS } from '@/constants';
 import {
   useHapticsEnabled,
   useSetHapticsEnabled,
 } from '@/hooks/useSettings';
+import { useResetStats } from '@/hooks/useStats';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, TYPOGRAPHY, type ThemeTokens } from '@/styles';
 
 /**
- * Settings screen — haptics toggle applies immediately via settingsStore.
+ * Settings screen — haptics toggle + stats reset.
  */
 const SettingsScreen = memo(() => {
   const { theme } = useTheme();
   const hapticsEnabled = useHapticsEnabled();
   const setHapticsEnabled = useSetHapticsEnabled();
+  const resetStats = useResetStats();
+  const [confirmVisible, setConfirmVisible] = useState(false);
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   const onHapticsChange = useCallback(
@@ -32,6 +35,19 @@ const SettingsScreen = memo(() => {
     },
     [setHapticsEnabled],
   );
+
+  const onResetPress = useCallback(() => {
+    setConfirmVisible(true);
+  }, []);
+
+  const onCancelReset = useCallback(() => {
+    setConfirmVisible(false);
+  }, []);
+
+  const onConfirmReset = useCallback(() => {
+    resetStats();
+    setConfirmVisible(false);
+  }, [resetStats]);
 
   return (
     <View style={styles.container}>
@@ -48,6 +64,16 @@ const SettingsScreen = memo(() => {
           value={hapticsEnabled}
           onValueChange={onHapticsChange}
         />
+        <Pressable
+          style={styles.resetButton}
+          onPress={onResetPress}
+          accessibilityRole="button"
+          accessibilityLabel={STRINGS.SETTINGS_RESET_STATS}
+        >
+          <Text style={styles.resetButtonText} allowFontScaling={false}>
+            {STRINGS.SETTINGS_RESET_STATS}
+          </Text>
+        </Pressable>
       </View>
 
       <View style={styles.section}>
@@ -66,6 +92,14 @@ const SettingsScreen = memo(() => {
           </Pressable>
         </Link>
       </View>
+
+      <ConfirmDialog
+        visible={confirmVisible}
+        title={STRINGS.SETTINGS_RESET_STATS_CONFIRM_TITLE}
+        message={STRINGS.SETTINGS_RESET_STATS_CONFIRM}
+        onConfirm={onConfirmReset}
+        onCancel={onCancelReset}
+      />
     </View>
   );
 });
@@ -108,6 +142,15 @@ function createStyles(theme: ThemeTokens) {
       ...TYPOGRAPHY.body,
       color: theme.BUTTON_TEXT,
       fontFamily: TYPOGRAPHY.score.fontFamily,
+    },
+    resetButton: {
+      minHeight: SPACING_TOKENS.TAP_TARGET_MIN,
+      justifyContent: 'center',
+      marginTop: SPACING_TOKENS.sm,
+    },
+    resetButtonText: {
+      ...TYPOGRAPHY.body,
+      color: theme.ACCENT,
     },
   });
 }

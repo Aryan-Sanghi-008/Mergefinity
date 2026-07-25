@@ -4,9 +4,14 @@
  * @description Zustand store state and action contracts.
  */
 
-import type { Board, GameMode, GameSnapshot, ThemeName } from './game.types';
+import type { Board, CellValue, GameMode, GameSnapshot, ThemeName } from './game.types';
 import type { AchievementId, AchievementStatus } from './achievement.types';
-import type { GameStats, LifetimeStats, SessionRecord } from './stats.types';
+import type {
+  GameStats,
+  LifetimeStats,
+  RecordGameEndPayload,
+  SessionRecord,
+} from './stats.types';
 
 /**
  * Finite game status machine.
@@ -38,6 +43,10 @@ export interface GameState {
   animationLock: boolean;
   /** Remaining Time Attack ms; `null` when mode has no timer. */
   timerRemainingMs: number | null;
+  /** Epoch ms when the current session started (for duration stats). */
+  sessionStartedAt: number;
+  /** True after this session has been written to statsStore. */
+  statsRecorded: boolean;
 }
 
 /** Payload after animated slide→merge→spawn completes. */
@@ -46,6 +55,8 @@ export interface CommitMovePayload {
   board: Board;
   /** Points added this move. */
   scoreDelta: number;
+  /** Post-merge tile values created this move (one per merge). */
+  mergeValues: CellValue[];
 }
 
 /** Imperative store actions. */
@@ -112,12 +123,16 @@ export interface StatsState {
 export interface StatsActions {
   /** Replace session history (capped). */
   setSessionHistory: (sessions: SessionRecord[]) => void;
-  /** Reset lifetime + per-mode stats (keeps best scores elsewhere). */
+  /** Reset counts/history/streaks; preserves best scores and best tiles. */
   resetStats: () => void;
   /** Raise per-mode best score when `score` is higher. */
   recordBestScore: (mode: GameMode, score: number) => void;
   /** Read best score for a mode. */
   getBestScore: (mode: GameMode) => number;
+  /** Accumulate merge events into histogram + per-mode totals. */
+  recordMerges: (mode: GameMode, values: readonly CellValue[]) => void;
+  /** Record a terminal win/loss once per session. */
+  recordGameEnd: (payload: RecordGameEndPayload) => void;
 }
 
 /** Combined stats store. */

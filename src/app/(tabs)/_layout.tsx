@@ -33,6 +33,13 @@ export default function TabsLayout() {
         options={{ title: STRINGS.GAME_TITLE, tabBarLabel: STRINGS.TAB_GAME }}
       />
       <Tabs.Screen
+        name="statistics"
+        options={{
+          title: STRINGS.STATS_TITLE,
+          tabBarLabel: STRINGS.TAB_STATISTICS,
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{ title: STRINGS.SETTINGS_TITLE, tabBarLabel: STRINGS.TAB_SETTINGS }}
       />

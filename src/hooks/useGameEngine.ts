@@ -33,6 +33,7 @@ import {
   hapticMove,
   hapticWin,
 } from '@/utils/haptics.utils';
+import { mergeValuesFromMoves } from '@/utils/statsHelpers';
 import {
   createTileIdFactory,
   entitiesForMerge,
@@ -281,7 +282,11 @@ export function useGameEngine(): GameEngineState {
           motionSeqRef.current += 1;
           setTiles(entitiesSettled(spawnTiles, motionSeqRef.current));
 
-          commitMove({ board: afterSpawn, scoreDelta: result.scoreDelta });
+          commitMove({
+            board: afterSpawn,
+            scoreDelta: result.scoreDelta,
+            mergeValues: mergeValuesFromMoves(result.tileMoves),
+          });
           if (result.scoreDelta > 0) {
             scoreDelta.play(result.scoreDelta);
           }

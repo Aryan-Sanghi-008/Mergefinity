@@ -62,6 +62,7 @@ export const STRINGS = {
   SETTINGS_VERSION: 'Version',
   SETTINGS_PLACEHOLDER: 'Settings coming in a later phase.',
   SETTINGS_RESET_STATS: 'Reset statistics',
+  SETTINGS_RESET_STATS_CONFIRM_TITLE: 'Reset statistics?',
   SETTINGS_RESET_STATS_CONFIRM: 'Clear all statistics? Best scores are kept.',
 
   // Themes
@@ -90,7 +91,17 @@ export const STRINGS = {
   STATS_EMPTY: 'Play a game in this mode to see stats.',
   STATS_SESSION_HISTORY: 'Recent games',
   STATS_ALL_TIME_BEST: 'All-time best',
-
+  STATS_TOTAL_GAMES: 'Total games',
+  STATS_PLAY_TIME: 'Play time (min)',
+  STATS_CURRENT_WIN_STREAK: 'Win streak',
+  STATS_LONGEST_WIN_STREAK: 'Longest win streak',
+  STATS_CURRENT_PLAY_STREAK: 'Play streak (days)',
+  STATS_LONGEST_PLAY_STREAK: 'Longest play streak',
+  STATS_MERGE_HISTOGRAM: 'Merges by tile',
+  STATS_WIN_RATE_SUFFIX: '%',
+  STATS_SESSION_SCORE: 'Score',
+  STATS_SESSION_TILE: 'Best tile',
+  STATS_LIFETIME_SECTION: 'Lifetime',
   // Achievements
   ACHIEVEMENTS_TITLE: 'Achievements',
   ACHIEVEMENTS_PROGRESS: 'Unlocked',

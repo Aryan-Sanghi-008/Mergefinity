@@ -37,6 +37,7 @@ export function createEmptyLifetimeStats(): LifetimeStats {
     longestWinStreak: 0,
     currentPlayStreakDays: 0,
     longestPlayStreakDays: 0,
+    lastPlayDayKey: null,
     mergeHistogram: {},
   };
 }
