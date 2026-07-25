@@ -1,68 +1,74 @@
 /**
  * @file theme.ts
  * @layer styles
- * @description Global visual design tokens for Mergefinity.
+ * @description Theme registry and lookup helpers.
  */
 
-import type { TextStyle, ViewStyle } from 'react-native';
+import type { CellValue, ThemeName } from '@/types';
 
-import { FONT_FAMILY, FONT_SIZE, RADII, SPACING } from '@/constants';
+import { RADII, SPACING, SPACING_TOKENS } from './spacing';
+import type { ThemeTokens } from './theme.types';
+import { classicTheme } from './themes/classic.theme';
+import { darkTheme } from './themes/dark.theme';
+import { ivoryTheme } from './themes/ivory.theme';
+import { midnightTheme } from './themes/midnight.theme';
+import { obsidianTheme } from './themes/obsidian.theme';
 
+/** Preview tile values for the P-04 theme lab screen. */
+export const THEME_LAB_PREVIEW_VALUES: readonly CellValue[] = [
+  2, 8, 2048, 131072,
+];
+
+/** All themes keyed by `ThemeName`. */
+export const THEMES: Record<ThemeName, ThemeTokens> = {
+  classic: classicTheme,
+  dark: darkTheme,
+  midnight: midnightTheme,
+  obsidian: obsidianTheme,
+  ivory: ivoryTheme,
+};
+
+/** Default theme on first launch. */
+export const DEFAULT_THEME_NAME: ThemeName = 'classic';
+
+/**
+ * Returns the token set for a theme name.
+ * @param name - Theme identifier
+ */
+export function getTheme(name: ThemeName): ThemeTokens {
+  return THEMES[name];
+}
+
+/**
+ * Legacy flat theme object for gradual migration (Classic defaults + spacing).
+ * Prefer `useTheme().theme` in components.
+ */
 export const THEME = {
   colors: {
-    background: '#FAF8EF',
-    boardBg: '#BBADA0',
-    cellEmpty: '#CDC1B4',
-    text: '#776E65',
-    textMuted: '#9A9084',
-    textLight: '#F9F6F0',
-    score: '#F9F6F0',
-    primary: '#8F7A66',
-    accent: '#F65E3B',
-    overlay: 'rgba(238,228,218,0.73)',
+    background: classicTheme.SURFACE,
+    boardBg: classicTheme.BOARD_BG,
+    cellEmpty: classicTheme.CELL_EMPTY,
+    text: classicTheme.TEXT_PRIMARY,
+    textMuted: classicTheme.TEXT_MUTED,
+    textLight: classicTheme.BUTTON_TEXT,
+    score: classicTheme.SCORE_TEXT,
+    primary: classicTheme.BUTTON_BG,
+    accent: classicTheme.ACCENT,
+    overlay: classicTheme.OVERLAY,
   },
   radii: RADII,
   spacing: SPACING,
+  spacingTokens: SPACING_TOKENS,
   shadows: {
-    /** Tiles intentionally flat (P-00); reserved for board chrome if needed later. */
     tile: {
-      elevation: 0,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 0,
-      shadowRadius: 0,
-    } satisfies ViewStyle,
+      elevation: classicTheme.elevation.TILE_ELEVATION,
+      shadowColor: classicTheme.elevation.shadowColor,
+      shadowOffset: classicTheme.elevation.shadowOffset,
+      shadowOpacity: classicTheme.elevation.shadowOpacity,
+      shadowRadius: classicTheme.elevation.shadowRadius,
+    },
   },
 } as const;
 
+export type { ThemeTokens } from './theme.types';
 export type Theme = typeof THEME;
-
-export const TYPOGRAPHY = {
-  tileValue: {
-    fontFamily: FONT_FAMILY.tile,
-    fontWeight: '700',
-  } satisfies TextStyle,
-  score: {
-    fontFamily: FONT_FAMILY.uiSemiBold,
-    fontSize: FONT_SIZE.score,
-    fontWeight: '600',
-  } satisfies TextStyle,
-  scoreLabel: {
-    fontFamily: FONT_FAMILY.uiMedium,
-    fontSize: FONT_SIZE.scoreLabel,
-    fontWeight: '500',
-    letterSpacing: 1,
-  } satisfies TextStyle,
-} as const;
-
-/**
- * Derive tile font size from value magnitude (P-00 / P-04 digit scale).
- * @param value - Tile numeric value
- * @returns Font size in dp
- */
-export function getTileFontSize(value: number): number {
-  if (value < 100) return FONT_SIZE.tileTwoDigit;
-  if (value < 1000) return FONT_SIZE.tileThreeDigit;
-  if (value < 10000) return FONT_SIZE.tileFourDigit;
-  return FONT_SIZE.tileFiveDigit;
-}

@@ -275,6 +275,8 @@ src/engine/winCondition.test.ts
 - **Shadows:** `TILE_ELEVATION` (Android 2dp), `BOARD_ELEVATION` (4dp)
 - **Motion:** all spring and timing configs as typed objects, not raw numbers
 
+> **P-04 lock:** Spacing/elevation values above are authoritative for implementation (supersede P-00’s 3px gap / 8dp tile radius / zero tile elevation for the token layer).
+
 ### Themes to Implement
 
 | Theme | Type | Description |
@@ -302,9 +304,9 @@ src/styles/index.ts
 
 ### Definition of Done
 
-- [ ] Swapping `ThemeName` from `'classic'` to `'midnight'` changes every visual in a test screen without a rebuild
-- [ ] Every tile text color passes WCAG AA contrast against its tile background in all 5 themes
-- [ ] No raw color hex, spacing value, or font size exists outside `src/styles/`
+- [x] Swapping `ThemeName` from `'classic'` to `'midnight'` changes every visual in a test screen without a rebuild (`app/theme-lab.tsx` + `ThemeProvider`)
+- [x] Every tile text color passes WCAG AA contrast against its tile background in all 5 themes
+- [x] No raw color hex, spacing value, or font size exists outside `src/styles/`
 
 ---
 

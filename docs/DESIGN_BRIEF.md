@@ -86,13 +86,8 @@ Navigation (from game plan P-14): bottom bar — Game / Statistics / Achievement
 
 ## P-04 token reconciliation note
 
-Game plan **P-04** currently lists `TILE_RADIUS` **6dp**, `TILE_GAP` **8dp**, and tile elevation. **P-00 board treatment above wins for product visual identity** until P-04 is explicitly updated to match:
+Game plan **P-04** locks `TILE_RADIUS` **6dp**, `TILE_GAP` **8dp**, and tile/board elevation (**2** / **4**). Those values are now implemented in `src/styles/spacing.ts` and theme elevation tokens, superseding the earlier P-00 paper board treatment (8dp / 3px / no elevation) for the shipped token layer.
 
-- `TILE_RADIUS` → 8dp  
-- `TILE_GAP` → 3px (document as density-independent px or convert carefully at token layer)  
-- `TILE_ELEVATION` → 0 for tiles  
-
-Do **not** change `src/` in P-00; reconcile when implementing P-04.
 
 ---
 

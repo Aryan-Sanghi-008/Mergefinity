@@ -66,6 +66,9 @@ export const STRINGS = {
   THEME_IVORY: 'Ivory',
   THEME_LOCKED_IAP: 'Unlock with purchase',
   THEME_SELECTED: 'Selected',
+  THEME_LAB_TITLE: 'Theme lab',
+  THEME_LAB_HINT: 'Tap a theme to swap tokens live.',
+  THEME_LAB_OPEN: 'Open theme lab',
 
   // Statistics
   STATS_TITLE: 'Statistics',

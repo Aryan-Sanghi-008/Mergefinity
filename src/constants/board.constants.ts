@@ -2,6 +2,7 @@
  * @file board.constants.ts
  * @layer constants
  * @description Board dimensions, win value, spawn weights, and move rotations.
+ *              Visual spacing/radii live in `src/styles/spacing.ts` (P-04).
  */
 
 import type { Direction } from '@/types';
@@ -43,39 +44,6 @@ export const DIR_ROTATIONS: Record<Direction, readonly [number, number]> = {
   UP: [3, 1],
   DOWN: [1, 3],
 };
-
-/** Fallback tile edge length in dp before `useBoardDimensions`. */
-export const TILE_SIZE = 72;
-
-/**
- * Inner board padding in dp (P-02 / P-04).
- * @see BOARD_PADDING alias
- */
-export const BOARD_PADDING_DP = 12;
-
-/**
- * Gap between cells in density-independent px (P-00 visual identity).
- * @see TILE_GAP alias
- */
-export const TILE_GAP_DP = 3;
-
-/**
- * Tile corner radius in dp (P-00).
- * @see TILE_RADIUS alias
- */
-export const TILE_RADIUS_DP = 8;
-
-/** Board outer corner radius in dp (P-00). */
-export const BOARD_RADIUS_DP = 10;
-
-/** @deprecated Prefer `BOARD_PADDING_DP`. */
-export const BOARD_PADDING = BOARD_PADDING_DP;
-
-/** @deprecated Prefer `TILE_GAP_DP`. */
-export const TILE_GAP = TILE_GAP_DP;
-
-/** @deprecated Prefer `TILE_RADIUS_DP`. */
-export const TILE_RADIUS = TILE_RADIUS_DP;
 
 /**
  * Max undo snapshots retained per game (Classic / Endless default limit).

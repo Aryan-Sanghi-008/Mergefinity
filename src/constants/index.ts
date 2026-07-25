@@ -1,13 +1,10 @@
 /**
  * @file index.ts
  * @layer constants
- * @description Public barrel for all constants — import from `@/constants` only.
+ * @description Public barrel for domain constants — visual tokens live in `@/styles`.
  */
 
 export {
-  BOARD_PADDING,
-  BOARD_PADDING_DP,
-  BOARD_RADIUS_DP,
   BOARD_SIZE,
   CELL_COUNT,
   DIR_ROTATIONS,
@@ -17,19 +14,12 @@ export {
   SPAWN_TILE_4,
   SPAWN_VALUES,
   SPAWN_WEIGHT_2,
-  TILE_GAP,
-  TILE_GAP_DP,
   TILE_MERGE_FACTOR,
-  TILE_RADIUS,
-  TILE_RADIUS_DP,
-  TILE_SIZE,
   WIN_VALUE,
 } from './board.constants';
 
 export { STRINGS } from './strings.constants';
 export type { StringKey } from './strings.constants';
-
-export { TILE_COLORS, TILE_TEXT_COLORS } from './colors.constants';
 
 export {
   MERGE_DURATION_MS,
@@ -47,7 +37,3 @@ export { SWIPE_MIN_DISTANCE, SWIPE_VELOCITY_THRESHOLD } from './gesture.constant
 
 export { STORAGE_KEYS } from './storage.constants';
 export type { StorageKey } from './storage.constants';
-
-export { RADII, SPACING } from './layout.constants';
-
-export { FONT_FAMILY, FONT_SIZE } from './typography.constants';

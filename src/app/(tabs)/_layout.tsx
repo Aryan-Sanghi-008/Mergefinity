@@ -4,21 +4,27 @@
  * @description Tab navigator layout for game and settings screens.
  */
 import { Tabs } from 'expo-router';
+import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 
 import { STRINGS } from '@/constants';
-import { THEME } from '@/styles/theme';
+import { useTheme } from '@/hooks/useTheme';
+import type { ThemeTokens } from '@/styles';
 
 /**
  * Bottom tab layout (thin — navigation only).
  */
 export default function TabsLayout() {
+  const { theme } = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <Tabs
       screenOptions={{
         headerStyle: styles.header,
-        headerTintColor: THEME.colors.text,
-        tabBarActiveTintColor: THEME.colors.primary,
+        headerTintColor: theme.TEXT_PRIMARY,
+        tabBarActiveTintColor: theme.BUTTON_BG,
+        tabBarInactiveTintColor: theme.TEXT_MUTED,
         tabBarStyle: styles.tabBar,
       }}
     >
@@ -34,11 +40,14 @@ export default function TabsLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    backgroundColor: THEME.colors.background,
-  },
-  tabBar: {
-    backgroundColor: THEME.colors.background,
-  },
-});
+function createStyles(theme: ThemeTokens) {
+  return StyleSheet.create({
+    header: {
+      backgroundColor: theme.SURFACE,
+    },
+    tabBar: {
+      backgroundColor: theme.SURFACE,
+      borderTopColor: theme.DIVIDER,
+    },
+  });
+}
