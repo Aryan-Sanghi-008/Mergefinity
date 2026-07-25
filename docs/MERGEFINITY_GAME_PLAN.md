@@ -60,21 +60,23 @@ docs/DESIGN_BRIEF.md
 docs/TILE_COLOR_MAP.md
 docs/MOTION_LANGUAGE.md
 docs/COMPETITOR_AUDIT.md
-docs/wireframes/          (Figma export PNGs)
+docs/wireframes/          (markdown layouts + low-fi PNG mocks)
 docs/TYPOGRAPHY.md
 ```
 
-### Open Decisions
+### Open Decisions — Resolved
 
-- Score pop-up: floating delta or animated counter roll?
-- Board shake on blocked move vs. subtle border flash?
-- Undo limit: 3 per game or unlimited (IAP unlocks unlimited)?
+| Decision | Resolution | Recorded in |
+|----------|------------|-------------|
+| Score pop-up | Both floating `+N` delta **and** animated counter roll | `DESIGN_BRIEF.md`, P-07 |
+| Blocked move feedback | Board edge pulse / border flash (not full-board shake as primary) | `DESIGN_BRIEF.md`, `MOTION_LANGUAGE.md`, P-07 |
+| Undo limit | Classic & Endless: 3/game; Challenge: 1; Time Attack: unlimited; IAP may unlock unlimited | `DESIGN_BRIEF.md`, P-09 / P-10 |
 
 ### Definition of Done
 
-- [ ] `DESIGN_BRIEF.md` committed and reviewed by all contributors
-- [ ] All wireframes signed off — no open layout questions remain
-- [ ] Tile color progression renders correctly across Classic, Dark, Midnight themes on paper
+- [x] `DESIGN_BRIEF.md` committed and reviewed by all contributors
+- [x] All wireframes signed off — no open layout questions remain
+- [x] Tile color progression renders correctly across Classic, Dark, Midnight themes on paper
 
 ---
 
