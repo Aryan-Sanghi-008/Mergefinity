@@ -103,7 +103,7 @@ docs/TYPOGRAPHY.md
 ```
 package.json
 tsconfig.json
-.eslintrc.js
+eslint.config.js
 .prettierrc
 eas.json
 app.json
@@ -113,28 +113,30 @@ babel.config.js          (module-resolver for @/* aliases)
 
 ### Pinned Dependencies
 
+> **Note (P-01 amendment):** Stack pinned to the **Expo SDK 57** line already in-repo (not the original ~51 draft). Versions below match `package.json` / lockfile intent.
+
 | Package | Version |
 |---------|---------|
-| expo | ~51.x |
-| react-native | 0.74.x |
-| react-native-reanimated | ~3.x |
+| expo | ~57.x |
+| react-native | 0.86.x |
+| react-native-reanimated | ~4.x |
 | react-native-gesture-handler | ~2.x |
 | zustand | ^5.x |
-| expo-router | ~3.x |
+| expo-router | ~57.x |
 | @react-native-async-storage/async-storage | ^2.x |
-| expo-haptics | ~13.x |
-| expo-font | ~12.x |
-| expo-keep-awake | ~13.x |
-| typescript | ~5.x |
+| expo-haptics | ~57.x |
+| expo-font | ~57.x |
+| expo-keep-awake | ~57.x |
+| typescript | ~5.x / ~6.x (Expo 57 toolchain) |
 | jest | ^29.x |
-| @testing-library/react-native | ^12.x |
+| @testing-library/react-native | ^14.x |
 
 ### Definition of Done
 
-- [ ] `npx expo start` runs without errors on a fresh clone
-- [ ] `npx tsc --noEmit` passes with zero errors
-- [ ] `npx eslint src/` passes with zero errors
-- [ ] Pre-commit hook blocks a commit that introduces a type error
+- [x] `npx expo start` runs without errors on a fresh clone
+- [x] `npx tsc --noEmit` passes with zero errors
+- [x] `npx eslint src/` passes with zero errors
+- [x] Pre-commit hook blocks a commit that introduces a type error
 
 ---
 
@@ -188,10 +190,10 @@ src/constants/index.ts
 
 ### Definition of Done
 
-- [ ] Every `CellValue` from 0 to 131072 has a tile color in `TILE_COLORS`
-- [ ] Zero raw string literals exist anywhere outside `constants/strings.constants.ts`
-- [ ] All types exported from `types/index.ts` and importable via `@/types`
-- [ ] JSDoc comment on every exported symbol
+- [x] Every `CellValue` from 0 to 131072 has a tile color in `TILE_COLORS`
+- [x] Zero raw **user-visible** string literals exist anywhere outside `constants/strings.constants.ts` (StyleSheet / `displayName` / storage keys / font tokens excluded)
+- [x] All types exported from `types/index.ts` and importable via `@/types`
+- [x] JSDoc comment on every exported symbol
 
 ---
 

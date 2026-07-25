@@ -6,7 +6,7 @@
 
 import type { TextStyle, ViewStyle } from 'react-native';
 
-import { RADII, SPACING } from '@/constants';
+import { FONT_FAMILY, FONT_SIZE, RADII, SPACING } from '@/constants';
 
 export const THEME = {
   colors: {
@@ -24,12 +24,13 @@ export const THEME = {
   radii: RADII,
   spacing: SPACING,
   shadows: {
+    /** Tiles intentionally flat (P-00); reserved for board chrome if needed later. */
     tile: {
-      elevation: 3,
+      elevation: 0,
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 3,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0,
+      shadowRadius: 0,
     } satisfies ViewStyle,
   },
 } as const;
@@ -38,29 +39,30 @@ export type Theme = typeof THEME;
 
 export const TYPOGRAPHY = {
   tileValue: {
-    fontFamily: 'ClearSans-Bold',
+    fontFamily: FONT_FAMILY.tile,
     fontWeight: '700',
   } satisfies TextStyle,
   score: {
-    fontFamily: 'ClearSans-Bold',
-    fontSize: 22,
-    fontWeight: '700',
+    fontFamily: FONT_FAMILY.uiSemiBold,
+    fontSize: FONT_SIZE.score,
+    fontWeight: '600',
   } satisfies TextStyle,
   scoreLabel: {
-    fontFamily: 'ClearSans-Bold',
-    fontSize: 10,
-    fontWeight: '700',
+    fontFamily: FONT_FAMILY.uiMedium,
+    fontSize: FONT_SIZE.scoreLabel,
+    fontWeight: '500',
     letterSpacing: 1,
   } satisfies TextStyle,
 } as const;
 
 /**
- * Derive tile font size from value magnitude.
+ * Derive tile font size from value magnitude (P-00 / P-04 digit scale).
  * @param value - Tile numeric value
  * @returns Font size in dp
  */
 export function getTileFontSize(value: number): number {
-  if (value < 100) return 36;
-  if (value < 1000) return 30;
-  return 24;
+  if (value < 100) return FONT_SIZE.tileTwoDigit;
+  if (value < 1000) return FONT_SIZE.tileThreeDigit;
+  if (value < 10000) return FONT_SIZE.tileFourDigit;
+  return FONT_SIZE.tileFiveDigit;
 }

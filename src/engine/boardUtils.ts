@@ -8,7 +8,10 @@
 import {
   BOARD_SIZE,
   CELL_COUNT,
+  SPAWN_TILE_2,
+  SPAWN_TILE_4,
   SPAWN_WEIGHT_2,
+  TILE_MERGE_FACTOR,
 } from '@/constants';
 import type { Board, CellValue, ShiftRowResult } from '@/types';
 
@@ -50,7 +53,7 @@ export function spawnTile(
     return [...board] as Board;
   }
 
-  const value: CellValue = rng() < SPAWN_WEIGHT_2 ? 2 : 4;
+  const value: CellValue = rng() < SPAWN_WEIGHT_2 ? SPAWN_TILE_2 : SPAWN_TILE_4;
   const next = [...board] as Board;
   next[cellIndex] = value;
   return next;
@@ -72,10 +75,10 @@ export function shiftRowLeft(row: readonly CellValue[]): ShiftRowResult {
     const current = filled[i];
     const next = filled[i + 1];
     if (current !== undefined && next !== undefined && current === next) {
-      const val = (current * 2) as CellValue;
+      const val = (current * TILE_MERGE_FACTOR) as CellValue;
       merged.push(val);
       delta += val;
-      i += 2;
+      i += TILE_MERGE_FACTOR;
     } else if (current !== undefined) {
       merged.push(current);
       i += 1;

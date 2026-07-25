@@ -1,17 +1,27 @@
 /**
  * @file index.ts
  * @layer constants
- * @description Public barrel for all constants — import from '@/constants' only.
+ * @description Public barrel for all constants — import from `@/constants` only.
  */
 
 export {
   BOARD_PADDING,
+  BOARD_PADDING_DP,
+  BOARD_RADIUS_DP,
   BOARD_SIZE,
   CELL_COUNT,
+  DIR_ROTATIONS,
   MAX_UNDO_HISTORY,
+  QUARTER_TURNS,
+  SPAWN_TILE_2,
+  SPAWN_TILE_4,
   SPAWN_VALUES,
   SPAWN_WEIGHT_2,
   TILE_GAP,
+  TILE_GAP_DP,
+  TILE_MERGE_FACTOR,
+  TILE_RADIUS,
+  TILE_RADIUS_DP,
   TILE_SIZE,
   WIN_VALUE,
 } from './board.constants';
@@ -24,14 +34,16 @@ export { TILE_COLORS, TILE_TEXT_COLORS } from './colors.constants';
 export {
   MERGE_DURATION_MS,
   MERGE_SCALE,
+  OVERLAY_DURATION_MS,
+  SCORE_DELTA_DURATION_MS,
+  SCORE_DELTA_TRAVEL_DP,
   SLIDE_DURATION_MS,
+  SPAWN_DELAY_MS,
   SPAWN_DURATION_MS,
+  SPAWN_INITIAL_SCALE,
 } from './animation.constants';
 
-export {
-  SWIPE_MIN_DISTANCE,
-  SWIPE_VELOCITY_THRESHOLD,
-} from './gesture.constants';
+export { SWIPE_MIN_DISTANCE, SWIPE_VELOCITY_THRESHOLD } from './gesture.constants';
 
 export { STORAGE_KEYS } from './storage.constants';
 export type { StorageKey } from './storage.constants';

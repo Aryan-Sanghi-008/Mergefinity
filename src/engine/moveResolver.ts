@@ -5,18 +5,10 @@
  *              via rotation + left-shift. No React, no side effects, no async.
  */
 
-import { BOARD_SIZE } from '@/constants';
+import { BOARD_SIZE, DIR_ROTATIONS, QUARTER_TURNS } from '@/constants';
 import type { Board, CellValue, Direction, MoveResult } from '@/types';
 
 import { shiftRowLeft } from './boardUtils';
-
-/** Pre/post clockwise 90° rotation counts so every direction becomes a left shift. */
-const DIR_ROTATIONS: Record<Direction, readonly [number, number]> = {
-  LEFT: [0, 0],
-  RIGHT: [2, 2],
-  UP: [3, 1],
-  DOWN: [1, 3],
-};
 
 /**
  * Rotates the board 90° clockwise `times` times.
@@ -26,7 +18,7 @@ const DIR_ROTATIONS: Record<Direction, readonly [number, number]> = {
  */
 export function rotateBoard(board: Readonly<Board>, times: number): Board {
   let current = [...board] as Board;
-  const rotations = ((times % 4) + 4) % 4;
+  const rotations = ((times % QUARTER_TURNS) + QUARTER_TURNS) % QUARTER_TURNS;
 
   for (let t = 0; t < rotations; t += 1) {
     const rotated = Array.from({ length: BOARD_SIZE * BOARD_SIZE }, () => 0 as CellValue);

@@ -8,6 +8,8 @@ import type { CellValue } from './game.types';
 
 /** Result of shifting and merging a single row leftward. */
 export interface ShiftRowResult {
+  /** Row after slide + merge, length `BOARD_SIZE`. */
   row: CellValue[];
+  /** Score points produced by merges in this row. */
   delta: number;
 }
