@@ -17,6 +17,12 @@ export const STORAGE_KEYS = {
   ACHIEVEMENTS: 'mergefinity:achievements',
   UNLOCKED_THEMES: 'mergefinity:unlocked_themes',
   IAP_ENTITLEMENTS: 'mergefinity:iap_entitlements',
+  /** Stub store receipt mirror for restore / force-close DoD. */
+  IAP_RECEIPTS: 'mergefinity:iap_receipts',
+  /** Ads consent decision (personalized | non_personalized | unset). */
+  ADS_CONSENT: 'mergefinity:ads_consent',
+  /** Count of losses considered for interstitial cadence. */
+  ADS_LOSS_COUNTER: 'mergefinity:ads_loss_counter',
   ONBOARDING_COMPLETE: 'mergefinity:onboarding_complete',
 } as const;
 

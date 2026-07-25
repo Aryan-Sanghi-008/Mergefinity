@@ -9,6 +9,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
+  AdBanner,
   MergeBar,
   ModeSelector,
   SessionCard,
@@ -168,6 +169,7 @@ const StatisticsScreen = memo(() => {
           </View>
         </>
       ) : null}
+      <AdBanner />
     </ScrollView>
   );
 });

@@ -6,7 +6,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useHasPremiumThemes, useSetHasPremiumThemes } from '@/hooks/usePurchase';
+import { useHasPremiumThemes, usePurchaseActions } from '@/hooks/usePurchase';
 import { useTheme } from '@/hooks/useTheme';
 import { useSettingsStore } from '@/store/settingsStore';
 import type { ThemeName } from '@/types';
@@ -31,7 +31,9 @@ export interface UseThemePreferenceResult {
   selectTheme: (name: ThemeName) => void;
   /** Toggle system dark follow (Classic only semantics). */
   setFollowSystemDark: (enabled: boolean) => void;
-  /** Confirm stub purchase and apply pending theme. */
+  /** True while theme bundle purchase is processing. */
+  isPurchasing: boolean;
+  /** Confirm purchase and apply pending theme. */
   confirmPurchase: () => void;
   /** Dismiss purchase sheet without buying. */
   cancelPurchase: () => void;
@@ -47,7 +49,7 @@ export function useThemePreference(): UseThemePreferenceResult {
   const setTheme = useSettingsStore((s) => s.setTheme);
   const setFollowSystemDarkAction = useSettingsStore((s) => s.setFollowSystemDark);
   const hasPremiumThemes = useHasPremiumThemes();
-  const setHasPremiumThemes = useSetHasPremiumThemes();
+  const { purchaseThemeBundle, isPurchasing } = usePurchaseActions();
 
   const [pendingPurchaseTheme, setPendingPurchaseTheme] = useState<ThemeName | null>(
     null,
@@ -118,20 +120,29 @@ export function useThemePreference(): UseThemePreferenceResult {
   );
 
   const confirmPurchase = useCallback(() => {
-    setHasPremiumThemes(true);
-    setPurchaseSheetVisible(false);
-    const pending = pendingPurchaseTheme;
-    setPendingPurchaseTheme(null);
-    if (pending !== null) {
-      applyPersisted(pending);
-    }
-  }, [setHasPremiumThemes, pendingPurchaseTheme, applyPersisted]);
+    void (async () => {
+      try {
+        await purchaseThemeBundle();
+        setPurchaseSheetVisible(false);
+        const pending = pendingPurchaseTheme;
+        setPendingPurchaseTheme(null);
+        if (pending !== null) {
+          applyPersisted(pending);
+        }
+      } catch {
+        // Purchase errors surface via sheet remaining open; caller may Alert.
+      }
+    })();
+  }, [purchaseThemeBundle, pendingPurchaseTheme, applyPersisted]);
 
   const cancelPurchase = useCallback(() => {
+    if (isPurchasing) {
+      return;
+    }
     setPurchaseSheetVisible(false);
     setPendingPurchaseTheme(null);
     syncFromSettings();
-  }, [syncFromSettings]);
+  }, [isPurchasing, syncFromSettings]);
 
   return {
     savedTheme,
@@ -141,6 +152,7 @@ export function useThemePreference(): UseThemePreferenceResult {
     pendingPurchaseTheme,
     purchaseSheetVisible,
     isPreviewing,
+    isPurchasing,
     selectTheme,
     setFollowSystemDark,
     confirmPurchase,

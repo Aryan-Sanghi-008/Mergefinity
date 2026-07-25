@@ -66,6 +66,29 @@ export const STRINGS = {
   SETTINGS_RESET_STATS_CONFIRM: 'Clear all statistics? Best scores are kept.',
   SETTINGS_COMING_SOON_TITLE: 'Coming soon',
   SETTINGS_COMING_SOON_BODY: 'This will be available in a later update.',
+  SETTINGS_RESTORE_PURCHASES: 'Restore purchases',
+  SETTINGS_REMOVE_ADS: 'Remove ads',
+  SETTINGS_SECTION_PURCHASES: 'Purchases',
+
+  PURCHASE_REMOVE_ADS_TITLE: 'Remove ads',
+  PURCHASE_REMOVE_ADS_BODY:
+    'Remove all banner and interstitial ads permanently.',
+  PURCHASE_REMOVE_ADS_CONFIRM: 'Purchase',
+  PURCHASE_LOADING: 'Processing…',
+  PURCHASE_SUCCESS_TITLE: 'Purchase complete',
+  PURCHASE_SUCCESS_REMOVE_ADS: 'Ads are removed on this device.',
+  PURCHASE_SUCCESS_THEMES: 'Premium themes unlocked.',
+  PURCHASE_RESTORE_SUCCESS: 'Purchases restored.',
+  PURCHASE_RESTORE_EMPTY: 'No purchases to restore.',
+  PURCHASE_ERROR_TITLE: 'Purchase failed',
+  PURCHASE_ERROR_BODY: 'Something went wrong. Try again.',
+
+  ADS_CONSENT_TITLE: 'Ads personalization',
+  ADS_CONSENT_BODY:
+    'Allow personalized ads? You can still see non-personalized ads if you decline.',
+  ADS_CONSENT_ALLOW: 'Allow',
+  ADS_CONSENT_DECLINE: 'Decline',
+  ADS_BANNER_LABEL: 'Advertisement',
 
   // About
   ABOUT_TITLE: 'About',

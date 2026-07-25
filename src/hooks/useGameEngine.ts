@@ -42,6 +42,10 @@ import {
   hapticMove,
   hapticWin,
 } from '@/utils/haptics.utils';
+import {
+  preloadInterstitial,
+  showInterstitialIfEligible,
+} from '@/utils/ads.utils';
 import { mergeValuesFromMoves } from '@/utils/statsHelpers';
 import {
   createTileIdFactory,
@@ -157,6 +161,10 @@ export function useGameEngine(): GameEngineState {
   }, [storeLock, locked]);
 
   useEffect(() => {
+    preloadInterstitial();
+  }, []);
+
+  useEffect(() => {
     const onChange = (next: AppStateStatus) => {
       const active = next === 'active';
       setAppActive(active);
@@ -233,6 +241,7 @@ export function useGameEngine(): GameEngineState {
     unlock();
     restart();
     resetTilesFromBoard();
+    preloadInterstitial();
   }, [unlock, restart, resetTilesFromBoard]);
 
   const onUndo = useCallback(() => {
@@ -312,6 +321,7 @@ export function useGameEngine(): GameEngineState {
 
           const lossesBefore = useStatsStore.getState().lifetime.consecutiveLosses;
           const wasRecorded = useGameStore.getState().statsRecorded;
+          const priorTotalGames = useStatsStore.getState().lifetime.totalGames;
           commitMove({
             board: afterSpawn,
             scoreDelta: result.scoreDelta,
@@ -338,6 +348,12 @@ export function useGameEngine(): GameEngineState {
             hapticWin();
           } else if (next.status === 'lost') {
             hapticGameOver();
+            if (justLost) {
+              void showInterstitialIfEligible({
+                outcome: 'loss',
+                priorTotalGames,
+              });
+            }
           }
         } finally {
           unlock();

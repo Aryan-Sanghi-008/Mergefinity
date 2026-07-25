@@ -7,6 +7,8 @@
 export { AchievementCard } from './AchievementCard';
 export type { AchievementCardProps } from './AchievementCard';
 
+export { AdBanner } from './AdBanner';
+
 export { AchievementToast } from './AchievementToast';
 export type { AchievementToastProps } from './AchievementToast';
 
@@ -26,7 +28,10 @@ export { ModeSelector } from './ModeSelector';
 export type { ModeSelectorProps } from './ModeSelector';
 
 export { PurchaseSheet } from './PurchaseSheet';
-export type { PurchaseSheetProps } from './PurchaseSheet';
+export type {
+  PurchaseSheetProps,
+  PurchaseSheetVariant,
+} from './PurchaseSheet';
 
 export { ScorePanel } from './ScorePanel';
 export type { ScorePanelProps } from './ScorePanel';

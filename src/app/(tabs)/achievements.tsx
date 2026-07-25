@@ -8,7 +8,7 @@ import { memo, useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AchievementCard } from '@/components/molecules';
+import { AchievementCard, AdBanner } from '@/components/molecules';
 import { STRINGS } from '@/constants';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useTheme } from '@/hooks/useTheme';
@@ -62,6 +62,7 @@ const AchievementsScreen = memo(() => {
           </View>
         )}
       />
+      <AdBanner />
     </View>
   );
 });

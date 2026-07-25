@@ -19,6 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   ConfirmDialog,
+  PurchaseSheet,
   SettingsLinkRow,
   SettingsToggleRow,
 } from '@/components/molecules';
@@ -29,11 +30,16 @@ import {
   useSetSoundEnabled,
   useSoundEnabled,
 } from '@/hooks/useSettings';
+import {
+  useHasRemovedAds,
+  usePurchaseActions,
+} from '@/hooks/usePurchase';
 import { useResetStats } from '@/hooks/useStats';
 import { useThemePreference } from '@/hooks/useThemePreference';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, TYPOGRAPHY, type ThemeTokens } from '@/styles';
 import type { ThemeName } from '@/types';
+import { Toast } from '@/components/atoms';
 
 const THEME_LABELS: Record<ThemeName, string> = {
   classic: STRINGS.THEME_CLASSIC,
@@ -60,7 +66,17 @@ const SettingsScreen = memo(() => {
     followSystemDark,
     setFollowSystemDark,
   } = useThemePreference();
+  const hasRemovedAds = useHasRemovedAds();
+  const {
+    isPurchasing,
+    purchaseRemoveAds,
+    restorePurchases,
+  } = usePurchaseActions();
   const [confirmVisible, setConfirmVisible] = useState(false);
+  const [removeAdsVisible, setRemoveAdsVisible] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastTitle, setToastTitle] = useState('');
+  const [toastBody, setToastBody] = useState('');
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   const appVersion =
@@ -103,6 +119,66 @@ const SettingsScreen = memo(() => {
     resetStats();
     setConfirmVisible(false);
   }, [resetStats]);
+
+  const showToast = useCallback((title: string, body: string) => {
+    setToastTitle(title);
+    setToastBody(body);
+    setToastVisible(true);
+  }, []);
+
+  const onRestore = useCallback(() => {
+    void (async () => {
+      try {
+        const receipts = await restorePurchases();
+        if (receipts.removeAds || receipts.themeBundle) {
+          showToast(
+            STRINGS.PURCHASE_SUCCESS_TITLE,
+            STRINGS.PURCHASE_RESTORE_SUCCESS,
+          );
+        } else {
+          showToast(
+            STRINGS.PURCHASE_SUCCESS_TITLE,
+            STRINGS.PURCHASE_RESTORE_EMPTY,
+          );
+        }
+      } catch {
+        showToast(STRINGS.PURCHASE_ERROR_TITLE, STRINGS.PURCHASE_ERROR_BODY);
+      }
+    })();
+  }, [restorePurchases, showToast]);
+
+  const onRemoveAdsPress = useCallback(() => {
+    if (hasRemovedAds) {
+      showToast(
+        STRINGS.PURCHASE_SUCCESS_TITLE,
+        STRINGS.PURCHASE_SUCCESS_REMOVE_ADS,
+      );
+      return;
+    }
+    setRemoveAdsVisible(true);
+  }, [hasRemovedAds, showToast]);
+
+  const onConfirmRemoveAds = useCallback(() => {
+    void (async () => {
+      try {
+        await purchaseRemoveAds();
+        setRemoveAdsVisible(false);
+        showToast(
+          STRINGS.PURCHASE_SUCCESS_TITLE,
+          STRINGS.PURCHASE_SUCCESS_REMOVE_ADS,
+        );
+      } catch {
+        showToast(STRINGS.PURCHASE_ERROR_TITLE, STRINGS.PURCHASE_ERROR_BODY);
+      }
+    })();
+  }, [purchaseRemoveAds, showToast]);
+
+  const onCancelRemoveAds = useCallback(() => {
+    if (isPurchasing) {
+      return;
+    }
+    setRemoveAdsVisible(false);
+  }, [isPurchasing]);
 
   const showComingSoon = useCallback(() => {
     Alert.alert(
@@ -212,6 +288,20 @@ const SettingsScreen = memo(() => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle} allowFontScaling={false}>
+            {STRINGS.SETTINGS_SECTION_PURCHASES}
+          </Text>
+          <SettingsLinkRow
+            label={STRINGS.SETTINGS_REMOVE_ADS}
+            onPress={onRemoveAdsPress}
+          />
+          <SettingsLinkRow
+            label={STRINGS.SETTINGS_RESTORE_PURCHASES}
+            onPress={onRestore}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle} allowFontScaling={false}>
             {STRINGS.SETTINGS_SECTION_INFO}
           </Text>
           <SettingsLinkRow
@@ -238,6 +328,19 @@ const SettingsScreen = memo(() => {
         message={STRINGS.SETTINGS_RESET_STATS_CONFIRM}
         onConfirm={onConfirmReset}
         onCancel={onCancelReset}
+      />
+      <PurchaseSheet
+        visible={removeAdsVisible}
+        variant="removeads"
+        loading={isPurchasing}
+        onConfirm={onConfirmRemoveAds}
+        onCancel={onCancelRemoveAds}
+      />
+      <Toast
+        visible={toastVisible}
+        title={toastTitle}
+        description={toastBody}
+        onDismiss={() => setToastVisible(false)}
       />
     </View>
   );

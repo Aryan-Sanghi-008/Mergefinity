@@ -40,6 +40,7 @@ const ThemesScreen = memo(() => {
     hasPremiumThemes,
     purchaseSheetVisible,
     isPreviewing,
+    isPurchasing,
     selectTheme,
     confirmPurchase,
     cancelPurchase,
@@ -103,6 +104,8 @@ const ThemesScreen = memo(() => {
       />
       <PurchaseSheet
         visible={purchaseSheetVisible}
+        variant="themebundle"
+        loading={isPurchasing}
         onConfirm={confirmPurchase}
         onCancel={cancelPurchase}
       />

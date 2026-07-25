@@ -1,16 +1,19 @@
 /**
  * @file _layout.tsx
  * @layer app
- * @description Root layout — GestureHandlerRootView, ThemeProvider, audio preload (P-14 / P-15).
+ * @description Root layout — theme, audio, ads consent, IAP sync (P-14–P-16).
  */
 import { useEffect } from 'react';
+import { Alert, AppState, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
+import { STRINGS } from '@/constants';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { useTheme } from '@/hooks/useTheme';
+import { setConsentPrompter } from '@/utils/ads.utils';
+import { syncPurchases } from '@/utils/iap.utils';
 import { SoundManager } from '@/utils/sound.utils';
 
 /**
@@ -34,6 +37,45 @@ function AudioBootstrap() {
 }
 
 /**
+ * Consent UI bridge + foreground purchase sync (P-16).
+ */
+function MonetizationBootstrap() {
+  useEffect(() => {
+    setConsentPrompter(
+      () =>
+        new Promise<'personalized' | 'non_personalized'>((resolve) => {
+          Alert.alert(STRINGS.ADS_CONSENT_TITLE, STRINGS.ADS_CONSENT_BODY, [
+            {
+              text: STRINGS.ADS_CONSENT_DECLINE,
+              style: 'cancel',
+              onPress: () => resolve('non_personalized'),
+            },
+            {
+              text: STRINGS.ADS_CONSENT_ALLOW,
+              onPress: () => resolve('personalized'),
+            },
+          ]);
+        }),
+    );
+    return () => {
+      setConsentPrompter(null);
+    };
+  }, []);
+
+  useEffect(() => {
+    void syncPurchases();
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        void syncPurchases();
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
+  return null;
+}
+
+/**
  * Root application layout.
  */
 export default function RootLayout() {
@@ -41,6 +83,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.root}>
       <ThemeProvider>
         <AudioBootstrap />
+        <MonetizationBootstrap />
         <ThemedStatusBar />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />

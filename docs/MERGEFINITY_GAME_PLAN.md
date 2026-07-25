@@ -864,9 +864,9 @@ src/utils/iap.utils.ts
 
 ### Definition of Done
 
-- [ ] Interstitial never appears when a player just reached 2048 for the first time
-- [ ] Purchasing Remove Ads and force-closing immediately before acknowledgement does not result in a charged but un-applied state
-- [ ] GDPR consent flow completes before any personalized ad is shown
+- [x] Interstitial never appears when a player just reached 2048 for the first time
+- [x] Purchasing Remove Ads and force-closing immediately before acknowledgement does not result in a charged but un-applied state
+- [x] GDPR consent flow completes before any personalized ad is shown
 
 ---
 

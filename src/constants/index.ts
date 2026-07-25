@@ -64,6 +64,15 @@ export { STORAGE_KEYS } from './storage.constants';
 export type { StorageKey } from './storage.constants';
 
 export {
+  AD_UNIT_BANNER,
+  AD_UNIT_INTERSTITIAL,
+  IAP_PRODUCT_IDS,
+  IAP_STUB_ACK_DELAY_MS,
+  INTERSTITIAL_EVERY_N_LOSSES,
+} from './ads.constants';
+export type { IapProductId } from './ads.constants';
+
+export {
   ACHIEVEMENT_IDS,
   ACHIEVEMENT_BLITZ_MOVES,
   ACHIEVEMENT_CENTURY_GAMES,
