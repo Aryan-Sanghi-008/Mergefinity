@@ -803,7 +803,7 @@ All assets under 50KB each; `.wav` format for cross-device reliability.
 
 ### Audio Implementation
 
-- `expo-av` for audio playback; sounds pre-loaded at app start via `SoundManager.preload()`
+- `expo-audio` for audio playback; sounds pre-loaded at app start via `SoundManager.preload()`
 - `SoundManager` (`utils/sound.utils.ts`): singleton class; `play()`, `preload()`, `setEnabled()`; all calls gated by `settingsStore.soundEnabled`
 - Audio ducks when the device is on silent mode
 - Sounds triggered from store middleware, not from components or hooks

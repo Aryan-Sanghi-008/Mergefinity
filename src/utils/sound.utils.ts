@@ -4,7 +4,12 @@
  * @description SoundManager singleton — preload / play / enable (P-15).
  */
 
-import { Audio, type AVPlaybackSource } from 'expo-av';
+import {
+  createAudioPlayer,
+  setAudioModeAsync,
+  type AudioPlayer,
+  type AudioSource,
+} from 'expo-audio';
 
 import {
   SLIDE_PITCH_BY_DIRECTION,
@@ -13,20 +18,20 @@ import {
 import { useSettingsStore } from '@/store/settingsStore';
 import type { Direction } from '@/types';
 
-const SOUND_SOURCES: Record<SoundId, AVPlaybackSource> = {
-  tile_slide: require('@/assets/sounds/tile_slide.wav') as AVPlaybackSource,
-  tile_merge_low: require('@/assets/sounds/tile_merge_low.wav') as AVPlaybackSource,
-  tile_merge_high: require('@/assets/sounds/tile_merge_high.wav') as AVPlaybackSource,
-  win_chime: require('@/assets/sounds/win_chime.wav') as AVPlaybackSource,
-  game_over: require('@/assets/sounds/game_over.wav') as AVPlaybackSource,
-  achievement_unlock: require('@/assets/sounds/achievement_unlock.wav') as AVPlaybackSource,
+const SOUND_SOURCES: Record<SoundId, AudioSource> = {
+  tile_slide: require('@/assets/sounds/tile_slide.wav') as number,
+  tile_merge_low: require('@/assets/sounds/tile_merge_low.wav') as number,
+  tile_merge_high: require('@/assets/sounds/tile_merge_high.wav') as number,
+  win_chime: require('@/assets/sounds/win_chime.wav') as number,
+  game_over: require('@/assets/sounds/game_over.wav') as number,
+  achievement_unlock: require('@/assets/sounds/achievement_unlock.wav') as number,
 };
 
 /**
  * Singleton audio player. All SFX go through here; gated by `soundEnabled`.
  */
 class SoundManagerImpl {
-  private sounds = new Map<SoundId, Audio.Sound>();
+  private players = new Map<SoundId, AudioPlayer>();
 
   private enabled = true;
 
@@ -40,7 +45,7 @@ class SoundManagerImpl {
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
     if (!enabled) {
-      void this.stopAll();
+      this.stopAll();
     }
   }
 
@@ -58,27 +63,18 @@ class SoundManagerImpl {
 
     this.preloadPromise = (async () => {
       this.enabled = useSettingsStore.getState().soundEnabled;
-      await Audio.setAudioModeAsync({
-        playsInSilentModeIOS: false,
-        allowsRecordingIOS: false,
-        staysActiveInBackground: false,
-        shouldDuckAndroid: true,
-        playThroughEarpieceAndroid: false,
+      await setAudioModeAsync({
+        playsInSilentMode: false,
+        shouldPlayInBackground: false,
+        interruptionMode: 'mixWithOthers',
       });
 
-      const entries = Object.entries(SOUND_SOURCES) as [
-        SoundId,
-        AVPlaybackSource,
-      ][];
-      await Promise.all(
-        entries.map(async ([id, source]) => {
-          const { sound } = await Audio.Sound.createAsync(source, {
-            shouldPlay: false,
-            volume: 1,
-          });
-          this.sounds.set(id, sound);
-        }),
-      );
+      const entries = Object.entries(SOUND_SOURCES) as [SoundId, AudioSource][];
+      for (const [id, source] of entries) {
+        const player = createAudioPlayer(source, { keepAudioSessionActive: true });
+        player.volume = 1;
+        this.players.set(id, player);
+      }
       this.preloaded = true;
     })();
 
@@ -120,36 +116,41 @@ class SoundManagerImpl {
       if (!this.isEnabled()) {
         return;
       }
-      const sound = this.sounds.get(id);
-      if (sound === undefined) {
+      const player = this.players.get(id);
+      if (player === undefined) {
         return;
       }
-      await sound.setRateAsync(rate, true);
-      await sound.setPositionAsync(0);
+      player.setPlaybackRate(rate);
+      await player.seekTo(0);
       if (!this.isEnabled()) {
         return;
       }
-      await sound.playAsync();
+      player.play();
     } catch {
       // Audio is best-effort (web / missing native module).
     }
   }
 
-  private async stopAll(): Promise<void> {
-    await Promise.all(
-      [...this.sounds.values()].map(async (sound) => {
-        try {
-          await sound.stopAsync();
-        } catch {
-          // ignore
-        }
-      }),
-    );
+  private stopAll(): void {
+    for (const player of this.players.values()) {
+      try {
+        player.pause();
+      } catch {
+        // ignore
+      }
+    }
   }
 
   /** Clears preload state for unit tests. */
   resetForTests(): void {
-    this.sounds.clear();
+    for (const player of this.players.values()) {
+      try {
+        player.remove();
+      } catch {
+        // ignore
+      }
+    }
+    this.players.clear();
     this.preloaded = false;
     this.preloadPromise = null;
     this.enabled = true;

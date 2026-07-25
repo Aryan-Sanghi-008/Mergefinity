@@ -9,20 +9,16 @@ jest.mock('react-native-worklets', () =>
 
 require('react-native-reanimated').setUpTests();
 
-jest.mock('expo-av', () => ({
-  Audio: {
-    Sound: {
-      createAsync: jest.fn(async () => ({
-        sound: {
-          playAsync: jest.fn(async () => undefined),
-          setPositionAsync: jest.fn(async () => undefined),
-          setRateAsync: jest.fn(async () => undefined),
-          stopAsync: jest.fn(async () => undefined),
-        },
-      })),
-    },
-    setAudioModeAsync: jest.fn(async () => undefined),
-  },
+jest.mock('expo-audio', () => ({
+  createAudioPlayer: jest.fn(() => ({
+    play: jest.fn(),
+    pause: jest.fn(),
+    seekTo: jest.fn(async () => undefined),
+    setPlaybackRate: jest.fn(),
+    remove: jest.fn(),
+    volume: 1,
+  })),
+  setAudioModeAsync: jest.fn(async () => undefined),
 }));
 
 jest.mock('expo-keep-awake', () => ({

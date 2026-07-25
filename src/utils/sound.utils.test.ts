@@ -7,28 +7,24 @@
 import { useSettingsStore } from '@/store/settingsStore';
 import { SoundManager } from '@/utils/sound.utils';
 
-const mockPlayAsync = jest.fn(async () => undefined);
-const mockSetPositionAsync = jest.fn(async () => undefined);
-const mockSetRateAsync = jest.fn(async () => undefined);
-const mockStopAsync = jest.fn(async () => undefined);
-const mockCreateAsync = jest.fn(async (_source?: unknown, _initial?: unknown) => ({
-  sound: {
-    playAsync: mockPlayAsync,
-    setPositionAsync: mockSetPositionAsync,
-    setRateAsync: mockSetRateAsync,
-    stopAsync: mockStopAsync,
-  },
+const mockPlay = jest.fn();
+const mockPause = jest.fn();
+const mockSeekTo = jest.fn(async () => undefined);
+const mockSetPlaybackRate = jest.fn();
+const mockRemove = jest.fn();
+const mockCreateAudioPlayer = jest.fn(() => ({
+  play: mockPlay,
+  pause: mockPause,
+  seekTo: mockSeekTo,
+  setPlaybackRate: mockSetPlaybackRate,
+  remove: mockRemove,
+  volume: 1,
 }));
 const mockSetAudioModeAsync = jest.fn(async (_mode?: unknown) => undefined);
 
-jest.mock('expo-av', () => ({
-  Audio: {
-    Sound: {
-      createAsync: (source: unknown, initial?: unknown) =>
-        mockCreateAsync(source, initial),
-    },
-    setAudioModeAsync: (mode: unknown) => mockSetAudioModeAsync(mode),
-  },
+jest.mock('expo-audio', () => ({
+  createAudioPlayer: () => mockCreateAudioPlayer(),
+  setAudioModeAsync: (mode: unknown) => mockSetAudioModeAsync(mode),
 }));
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -48,24 +44,24 @@ describe('SoundManager', () => {
   it('preloads with silent-mode disabled on iOS', async () => {
     await SoundManager.preload();
     expect(mockSetAudioModeAsync).toHaveBeenCalledWith(
-      expect.objectContaining({ playsInSilentModeIOS: false }),
+      expect.objectContaining({ playsInSilentMode: false }),
     );
-    expect(mockCreateAsync).toHaveBeenCalled();
+    expect(mockCreateAudioPlayer).toHaveBeenCalled();
   });
 
   it('does not play when sound is disabled via settings', async () => {
     await SoundManager.preload();
     useSettingsStore.setState({ soundEnabled: false });
     SoundManager.setEnabled(false);
-    mockPlayAsync.mockClear();
+    mockPlay.mockClear();
     SoundManager.play('win_chime');
     await Promise.resolve();
-    expect(mockPlayAsync).not.toHaveBeenCalled();
+    expect(mockPlay).not.toHaveBeenCalled();
   });
 
   it('setEnabled(false) stops playback', async () => {
     await SoundManager.preload();
     SoundManager.setEnabled(false);
-    expect(mockStopAsync).toHaveBeenCalled();
+    expect(mockPause).toHaveBeenCalled();
   });
 });
