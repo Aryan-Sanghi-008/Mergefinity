@@ -1,0 +1,17 @@
+---
+description: Pure engine rules — immutability, rng injection, co-located tests
+globs: src/engine/**
+alwaysApply: false
+---
+
+# Engine Purity
+
+- No React, async, store, or hooks imports
+- `Readonly<Board>` inputs; return new arrays — never mutate
+- Inject `rng: () => number = Math.random` for randomness
+- Directions via rotation + `shiftRowLeft` — never 4 switch branches
+- Flat board length 16, row-major: `index = row * BOARD_SIZE + col`
+- Every function has sibling `*.test.ts` with seeded rng and freeze immutability checks
+- Prefer Result unions over throw
+
+See skill `mergefinity-engine` and `docs/cursor/cursor_skills.md` SK-06/SK-07.

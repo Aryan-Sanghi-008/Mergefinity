@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "Mergefinity",
+    "slug": "mergefinity",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/images/icon.png",
+    "scheme": "mergefinity",
+    "userInterfaceStyle": "light",
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/images/adaptive-icon.png",
+        "backgroundColor": "#FAF8EF"
+      },
+      "package": "com.mergefinity.app"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.mergefinity.app"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/assets/images/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#FAF8EF"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

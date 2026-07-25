@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+
+# Expo / Metro
+.expo/
+.expo-shared/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native (prebuild / EAS)
+android/
+ios/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+*.orig.*
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Logs & debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# Tests & coverage
+coverage/
+.jest/
+*.lcov
+
+# TypeScript / bundler caches
+*.tsbuildinfo
+.metro-cache/
+.cache/
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+
+# Editors / IDE (keep project .cursor/ rules & skills)
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
+
+# Misc local / temp
+*.local
+tmp/
+temp/
+.turbo/

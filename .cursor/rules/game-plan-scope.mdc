@@ -1,0 +1,26 @@
+---
+description: Product and implementation scope is solely docs/MERGEFINITY_GAME_PLAN.md — nothing outside it
+alwaysApply: true
+---
+
+# Game Plan Scope
+
+**Source of truth for what to build:** [`docs/MERGEFINITY_GAME_PLAN.md`](docs/MERGEFINITY_GAME_PLAN.md)
+
+## Must
+
+- Treat the game plan as the **only** product/implementation roadmap (phases P-00–P-20, deliverables, DoD, open decisions).
+- Before implementing a feature, screen, mode, achievement, theme, IAP, or polish item: **read the matching phase** in that document and align deliverables to it.
+- If a request is not covered by the game plan, **stop** — do not invent scope. Either map it to an existing phase or ask the user to amend the plan first.
+
+## Must not
+
+- Implement features, modes, screens, monetization, or polish **outside** `docs/MERGEFINITY_GAME_PLAN.md`.
+- Expand phase scope with "nice to haves" not listed in that phase's deliverables / definition of done.
+- Treat other docs (design briefs, cursor rules, skills) as a license to add product scope the game plan does not list.
+
+## How this relates to other rules
+
+- **What / when / phase DoD** → game plan only.
+- **How to code** (layers, purity, exports, UI patterns) → existing Cursor rules and `docs/cursor/*`.
+- If coding standards and the game plan conflict on *product* content, the game plan wins; if they conflict on *engineering constraints*, stop and surface the conflict.

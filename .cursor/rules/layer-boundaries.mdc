@@ -1,0 +1,27 @@
+---
+description: Mergefinity folder layout, layer boundaries, and import direction
+alwaysApply: true
+---
+
+# Layer Boundaries
+
+```
+src/app/          Screens only — compose organisms, call hooks
+src/components/   atoms → molecules → organisms (never upward)
+src/hooks/        Wire store + engine + gestures; no JSX
+src/store/        Zustand; calls engine; no hooks/components
+src/engine/       Pure TS; no React/async/store/hooks
+src/types/        Types only; no runtime code
+src/constants/    Values only; may import types for annotations
+src/utils/        Stateless helpers
+src/styles/       Design tokens
+```
+
+## Import direction (no upward arrows)
+
+`constants → types → engine → store → hooks → components → app`
+
+- Atoms/molecules: props only, no store
+- Organisms: may call hooks; never call engine directly
+- Always `@/` aliases across top-level folders
+- Barrels (`index.ts`) re-export only — no logic

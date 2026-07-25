@@ -1,0 +1,23 @@
+---
+description: Zustand store and hooks — selectors, persist, gesture bridge
+globs: "{src/store,src/hooks}/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Store & Hooks
+
+## Zustand
+
+- Middleware: `devtools(persist(analytics(impl)))`
+- Persist via `partialize`: `bestScore`, settings, theme only — never active board
+- Selectors at call site: `useGameStore(s => s.score)`
+- History capped at 5; actions use `get()` for latest state
+- Storage keys use `mergefinity:` prefix from constants
+
+## Hooks
+
+- Return data/callbacks — never JSX
+- May import store + engine; never components
+- Gestures: worklet `onEnd` → `runOnJS(handler)` — never call store from worklet
+- Split if hook >80 lines
+- Every custom hook needs a test

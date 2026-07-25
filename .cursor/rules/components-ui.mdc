@@ -1,0 +1,17 @@
+---
+description: Component and screen UI rules — memo, StyleSheet, thin screens
+globs: "{src/components,src/app}/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Components & Screens
+
+- Every component: `memo` + `displayName`
+- Styles: `StyleSheet.create()` at file bottom — no inline `{}`
+- No `useEffect` for derived state — compute or `useMemo`
+- Atoms/molecules: no store access
+- Organisms: hooks only — never call `engine/` directly
+- Screens (`app/`): compose organisms; zero game logic; zero inline styles
+- Split if component >120 lines
+- `allowFontScaling={false}` on game tile text
+- Android: `elevation` via `Platform.select` for shadows

@@ -1,0 +1,33 @@
+---
+description: TypeScript strict rules, named exports, naming, and import type
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# TypeScript & Exports
+
+- Named exports only — match filename
+- `import type` for type-only imports
+- No `any` without eslint-disable comment + TODO
+- Types live in `src/types/` — never inline in consumers
+- JSDoc on every exported symbol
+- Options object if >3 parameters
+
+## Naming
+
+| What | Format |
+|------|--------|
+| Component / Type | PascalCase |
+| Hook | `use` + PascalCase |
+| Function | camelCase, verb-first |
+| Constant | SCREAMING_SNAKE |
+| Component file | `PascalCase.tsx` |
+| Logic file | `camelCase.ts` |
+| Types file | `*.types.ts` |
+| Constants file | `*.constants.ts` |
+| Event prop | `on` + PascalCase |
+| Boolean prop | `is` / `has` / `can` |
+
+## Import order
+
+React → RN → Expo → third-party → types → constants → engine → store → hooks → components → styles
