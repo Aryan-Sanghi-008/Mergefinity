@@ -9,6 +9,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { TimerReadout } from '@/components/atoms';
 import {
+  AchievementToast,
   ConfirmDialog,
   GameOverOverlay,
   ModeSelector,
@@ -86,6 +87,10 @@ const GameScreen = memo(() => {
         message={STRINGS.MODE_SWITCH_CONFIRM_SUB}
         onConfirm={modeApi.confirmModeChange}
         onCancel={modeApi.cancelModeChange}
+      />
+      <AchievementToast
+        achievementId={game.achievementToastId}
+        onDismiss={game.onAchievementToastDismiss}
       />
     </View>
   );

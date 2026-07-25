@@ -1,7 +1,7 @@
 /**
  * @file statsStore.ts
  * @layer store
- * @description Lifetime / per-mode stats + session history (P-11).
+ * @description Lifetime / per-mode stats + session history (P-11 / P-12).
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -115,6 +115,11 @@ export const useStatsStore = create<StatsStore>()(
             currentWinStreak,
           );
           const playMinutes = durationSecondsToPlayMinutes(durationSeconds);
+          const consecutiveLosses = isWin ? 0 : lifetime.consecutiveLosses + 1;
+          const modesWon = { ...lifetime.modesWon };
+          if (isWin && mode !== 'endless') {
+            modesWon[mode] = true;
+          }
 
           const session: SessionRecord = {
             mode,
@@ -148,11 +153,21 @@ export const useStatsStore = create<StatsStore>()(
               ) as CellValue,
               currentWinStreak,
               longestWinStreak,
+              consecutiveLosses,
+              modesWon,
               ...playStreak,
             },
             sessionHistory: [...get().sessionHistory, session].slice(
               -MAX_SESSION_HISTORY,
             ),
+          });
+        },
+        setModesWon: (modesWon) => {
+          set({
+            lifetime: {
+              ...get().lifetime,
+              modesWon,
+            },
           });
         },
       })),
@@ -169,10 +184,20 @@ export const useStatsStore = create<StatsStore>()(
           if (slice === undefined || slice === null) {
             return current;
           }
+          const emptyLifetime = createEmptyLifetimeStats();
           const lifetime = {
-            ...createEmptyLifetimeStats(),
+            ...emptyLifetime,
             ...current.lifetime,
             ...slice.lifetime,
+            modesWon: {
+              ...emptyLifetime.modesWon,
+              ...current.lifetime.modesWon,
+              ...slice.lifetime?.modesWon,
+            },
+            consecutiveLosses:
+              slice.lifetime?.consecutiveLosses ??
+              current.lifetime.consecutiveLosses ??
+              0,
           };
           if (lifetime.lastPlayDayKey === undefined) {
             lifetime.lastPlayDayKey = null;

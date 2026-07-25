@@ -30,13 +30,22 @@ export interface ToastProps {
   iconName?: IconName;
   /** Called after dismiss animation / timeout. */
   onDismiss: () => void;
+  /** Auto-dismiss delay in ms (defaults to TOAST_DURATION_MS). */
+  durationMs?: number;
 }
 
 /**
  * Bottom slide-up toast for achievement unlocks.
  */
 const Toast = memo(
-  ({ visible, title, description, iconName = 'achievements', onDismiss }: ToastProps) => {
+  ({
+    visible,
+    title,
+    description,
+    iconName = 'achievements',
+    onDismiss,
+    durationMs = TOAST_DURATION_MS,
+  }: ToastProps) => {
     const { theme } = useTheme();
     const translateY = useSharedValue(TOAST_TRAVEL_DP);
     const opacity = useSharedValue(0);
@@ -58,28 +67,32 @@ const Toast = memo(
         return;
       }
 
-      translateY.value = withTiming(0, { duration: OVERLAY_ANIMATION.durationMs });
-      opacity.value = withTiming(1, { duration: OVERLAY_ANIMATION.durationMs });
+      translateY.set(withTiming(0, { duration: OVERLAY_ANIMATION.durationMs }));
+      opacity.set(withTiming(1, { duration: OVERLAY_ANIMATION.durationMs }));
 
       const timer = setTimeout(() => {
-        opacity.value = withTiming(0, { duration: OVERLAY_ANIMATION.durationMs }, (finished) => {
-          if (finished) {
-            runOnJS(onDismiss)();
-          }
-        });
-        translateY.value = withTiming(TOAST_TRAVEL_DP, {
-          duration: OVERLAY_ANIMATION.durationMs,
-        });
-      }, TOAST_DURATION_MS);
+        opacity.set(
+          withTiming(0, { duration: OVERLAY_ANIMATION.durationMs }, (finished) => {
+            if (finished) {
+              runOnJS(onDismiss)();
+            }
+          }),
+        );
+        translateY.set(
+          withTiming(TOAST_TRAVEL_DP, {
+            duration: OVERLAY_ANIMATION.durationMs,
+          }),
+        );
+      }, durationMs);
 
       return () => {
         clearTimeout(timer);
       };
-    }, [visible, onDismiss, opacity, translateY]);
+    }, [visible, onDismiss, opacity, translateY, durationMs]);
 
     const animatedStyle = useAnimatedStyle(() => ({
-      transform: [{ translateY: translateY.value }],
-      opacity: opacity.value,
+      transform: [{ translateY: translateY.get() }],
+      opacity: opacity.get(),
     }));
 
     if (!visible) {

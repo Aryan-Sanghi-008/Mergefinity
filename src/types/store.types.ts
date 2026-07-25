@@ -5,7 +5,7 @@
  */
 
 import type { Board, CellValue, GameMode, GameSnapshot, ThemeName } from './game.types';
-import type { AchievementId, AchievementStatus } from './achievement.types';
+import type { AchievementId, AchievementProgress } from './achievement.types';
 import type {
   GameStats,
   LifetimeStats,
@@ -47,6 +47,8 @@ export interface GameState {
   sessionStartedAt: number;
   /** True after this session has been written to statsStore. */
   statsRecorded: boolean;
+  /** Undos performed this session (for Purist). */
+  undosUsed: number;
 }
 
 /** Payload after animated slide→merge→spawn completes. */
@@ -133,6 +135,8 @@ export interface StatsActions {
   recordMerges: (mode: GameMode, values: readonly CellValue[]) => void;
   /** Record a terminal win/loss once per session. */
   recordGameEnd: (payload: RecordGameEndPayload) => void;
+  /** Replace modesWon flags (achievement exploration). */
+  setModesWon: (modesWon: Record<GameMode, boolean>) => void;
 }
 
 /** Combined stats store. */
@@ -140,14 +144,16 @@ export type StatsStore = StatsState & StatsActions;
 
 /** Achievement unlock map. */
 export interface AchievementState {
-  /** Status per achievement id. */
-  statuses: Record<AchievementId, AchievementStatus>;
+  /** Progress / unlock state per achievement id. */
+  progress: Record<AchievementId, AchievementProgress>;
 }
 
 /** Achievement store actions (P-12). */
 export interface AchievementActions {
-  /** Mark an achievement unlocked. */
+  /** Mark an achievement unlocked (idempotent). */
   unlock: (id: AchievementId) => void;
+  /** Unlock many ids (idempotent). */
+  unlockMany: (ids: readonly AchievementId[]) => void;
   /** Reset all to locked. */
   resetAchievements: () => void;
 }

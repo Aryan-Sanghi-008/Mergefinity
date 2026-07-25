@@ -691,9 +691,9 @@ app/achievements.tsx
 
 ### Definition of Done
 
-- [ ] No achievement can unlock twice — idempotent unlock logic verified
-- [ ] Achieving multiple at once queues toasts; second toast appears only after first dismisses
-- [ ] Achievement state survives an app reinstall via Android backup
+- [x] No achievement can unlock twice — idempotent unlock logic verified
+- [x] Achieving multiple at once queues toasts; second toast appears only after first dismisses
+- [x] Achievement state survives an app reinstall via Android backup
 
 ---
 

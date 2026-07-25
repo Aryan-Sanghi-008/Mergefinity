@@ -71,6 +71,13 @@ describe('useStatsStore', () => {
         currentPlayStreakDays: 0,
         longestPlayStreakDays: 0,
         lastPlayDayKey: null,
+        consecutiveLosses: 0,
+        modesWon: {
+          classic: false,
+          endless: false,
+          challenge: false,
+          'time-attack': false,
+        },
         mergeHistogram: {},
       },
       sessionHistory: [],

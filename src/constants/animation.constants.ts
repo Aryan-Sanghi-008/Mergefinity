@@ -52,8 +52,11 @@ export const WIN_CARD_OVERSHOOT_SCALE = 1.04;
 /** Reduced-motion: collapse decorative durations to this floor (ms). */
 export const REDUCED_MOTION_DURATION_MS = 0;
 
-/** Achievement toast auto-dismiss duration in ms. */
+/** Achievement toast auto-dismiss duration in ms (generic atom fallback). */
 export const TOAST_DURATION_MS = 3000;
+
+/** P-12 achievement unlock toast duration in ms. */
+export const ACHIEVEMENT_TOAST_DURATION_MS = 3500;
 
 /** Toast slide travel distance in dp. */
 export const TOAST_TRAVEL_DP = 24;

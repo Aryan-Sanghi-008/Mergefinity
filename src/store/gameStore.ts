@@ -38,6 +38,7 @@ export type GamePersistedSlice = Pick<
   | 'timerRemainingMs'
   | 'sessionStartedAt'
   | 'statsRecorded'
+  | 'undosUsed'
 >;
 
 function undosForMode(mode: GameMode): number {
@@ -80,6 +81,7 @@ function createInitialState(mode: GameMode = 'classic'): Omit<
     timerRemainingMs: timerForMode(mode),
     sessionStartedAt: Date.now(),
     statsRecorded: false,
+    undosUsed: 0,
   };
 }
 
@@ -188,6 +190,7 @@ export const useGameStore = create<GameStore>()(
             undosRemaining: unlimited
               ? UNDO_UNLIMITED
               : state.undosRemaining - 1,
+            undosUsed: state.undosUsed + 1,
             status: 'playing',
             animationLock: false,
           });
@@ -265,6 +268,7 @@ export const useGameStore = create<GameStore>()(
           timerRemainingMs: state.timerRemainingMs,
           sessionStartedAt: state.sessionStartedAt,
           statsRecorded: state.statsRecorded,
+          undosUsed: state.undosUsed,
         }),
         merge: (persisted, current) => {
           const slice = persisted as Partial<GamePersistedSlice> | undefined;
@@ -277,6 +281,7 @@ export const useGameStore = create<GameStore>()(
             animationLock: false,
             sessionStartedAt: slice.sessionStartedAt ?? current.sessionStartedAt,
             statsRecorded: slice.statsRecorded ?? current.statsRecorded,
+            undosUsed: slice.undosUsed ?? current.undosUsed,
             status:
               slice.status === 'animating' ? 'playing' : (slice.status ?? current.status),
           };

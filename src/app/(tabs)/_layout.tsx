@@ -40,6 +40,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="achievements"
+        options={{
+          title: STRINGS.ACHIEVEMENTS_TITLE,
+          tabBarLabel: STRINGS.TAB_ACHIEVEMENTS,
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{ title: STRINGS.SETTINGS_TITLE, tabBarLabel: STRINGS.TAB_SETTINGS }}
       />

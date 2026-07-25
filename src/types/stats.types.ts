@@ -48,6 +48,10 @@ export interface LifetimeStats {
    * Last calendar day a game was recorded (`YYYY-MM-DD` local), or `null`.
    */
   lastPlayDayKey: string | null;
+  /** Consecutive losses (resets on win); used for Comeback. */
+  consecutiveLosses: number;
+  /** Modes that have met win criteria at least once. */
+  modesWon: Record<GameMode, boolean>;
   /**
    * Merge histogram: how many times each tile value was created.
    * Keys are CellValue powers of two from 2 upward.

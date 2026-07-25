@@ -44,6 +44,7 @@ describe('useGameStore', () => {
       timerRemainingMs: null,
       sessionStartedAt: Date.now(),
       statsRecorded: false,
+      undosUsed: 0,
     });
   });
 

@@ -40,6 +40,8 @@ export type {
 export type {
   Achievement,
   AchievementCategory,
+  AchievementContext,
+  AchievementDefinition,
   AchievementId,
   AchievementProgress,
   AchievementStatus,

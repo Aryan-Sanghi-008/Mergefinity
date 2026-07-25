@@ -18,6 +18,8 @@ import {
   UNDO_UNLIMITED,
 } from '@/constants';
 import { resolveMove, spawnTile } from '@/engine';
+import { useAchievementChecker } from '@/hooks/useAchievementChecker';
+import { useAchievementQueue } from '@/hooks/useAchievementQueue';
 import { useAnimationLock } from '@/hooks/useAnimationLock';
 import { useBoardShake } from '@/hooks/useBoardShake';
 import { useCountdown } from '@/hooks/useCountdown';
@@ -25,7 +27,14 @@ import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useScoreCounter } from '@/hooks/useScoreCounter';
 import { useScoreDelta } from '@/hooks/useScoreDelta';
 import { useGameStore } from '@/store/gameStore';
-import type { BoardTileEntity, Direction, GameMode, GameStatus } from '@/types';
+import { useStatsStore } from '@/store/statsStore';
+import type {
+  AchievementId,
+  BoardTileEntity,
+  Direction,
+  GameMode,
+  GameStatus,
+} from '@/types';
 import { delay } from '@/utils/delay';
 import {
   hapticGameOver,
@@ -77,6 +86,10 @@ export interface GameEngineState {
   hasTimer: boolean;
   /** True when win came from timer expiry (no Keep Going). */
   isTimeUpWin: boolean;
+  /** Current achievement toast id. */
+  achievementToastId: AchievementId | null;
+  /** Dismiss current achievement toast. */
+  onAchievementToastDismiss: () => void;
   /** Swipe handler. */
   onMove: (direction: Direction) => void;
   /** New game. */
@@ -128,6 +141,12 @@ export function useGameEngine(): GameEngineState {
   const { locked, lock, unlock } = useAnimationLock();
   const scoreDelta = useScoreDelta();
   const edgePulse = useBoardShake();
+  const evaluateAchievements = useAchievementChecker();
+  const {
+    currentId: achievementToastId,
+    enqueue: enqueueAchievements,
+    dismiss: onAchievementToastDismiss,
+  } = useAchievementQueue();
 
   const [tiles, setTiles] = useState(tileSeed.tiles);
   const scoreValue = useScoreCounter(score);
@@ -147,10 +166,19 @@ export function useGameEngine(): GameEngineState {
   }, []);
 
   const onExpire = useCallback(() => {
+    const lossesBefore = useStatsStore.getState().lifetime.consecutiveLosses;
+    const wasRecorded = useGameStore.getState().statsRecorded;
     setIsTimeUpWin(true);
     expireTimer();
     hapticWin();
-  }, [expireTimer]);
+    const after = useGameStore.getState();
+    const justWon = after.statsRecorded && !wasRecorded;
+    const unlocked = evaluateAchievements({
+      justWon,
+      consecutiveLossesBeforeWin: lossesBefore,
+    });
+    enqueueAchievements(unlocked);
+  }, [expireTimer, evaluateAchievements, enqueueAchievements]);
 
   const timerPaused =
     !appActive ||
@@ -282,6 +310,8 @@ export function useGameEngine(): GameEngineState {
           motionSeqRef.current += 1;
           setTiles(entitiesSettled(spawnTiles, motionSeqRef.current));
 
+          const lossesBefore = useStatsStore.getState().lifetime.consecutiveLosses;
+          const wasRecorded = useGameStore.getState().statsRecorded;
           commitMove({
             board: afterSpawn,
             scoreDelta: result.scoreDelta,
@@ -291,10 +321,21 @@ export function useGameEngine(): GameEngineState {
             scoreDelta.play(result.scoreDelta);
           }
 
-          const nextStatus = useGameStore.getState().status;
-          if (nextStatus === 'won') {
+          const next = useGameStore.getState();
+          const justWon =
+            next.statsRecorded && !wasRecorded && next.status === 'won';
+          const justLost =
+            next.statsRecorded && !wasRecorded && next.status === 'lost';
+          const unlocked = evaluateAchievements({
+            justWon,
+            justLost,
+            consecutiveLossesBeforeWin: lossesBefore,
+          });
+          enqueueAchievements(unlocked);
+
+          if (next.status === 'won') {
             hapticWin();
-          } else if (nextStatus === 'lost') {
+          } else if (next.status === 'lost') {
             hapticGameOver();
           }
         } finally {
@@ -314,6 +355,8 @@ export function useGameEngine(): GameEngineState {
       edgePulse,
       scoreDelta,
       phaseMs,
+      evaluateAchievements,
+      enqueueAchievements,
     ],
   );
 
@@ -340,6 +383,8 @@ export function useGameEngine(): GameEngineState {
     timerRemaining,
     hasTimer,
     isTimeUpWin,
+    achievementToastId,
+    onAchievementToastDismiss,
     onMove,
     onNewGame,
     onUndo,

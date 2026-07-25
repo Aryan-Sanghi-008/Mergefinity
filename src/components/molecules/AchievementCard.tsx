@@ -22,6 +22,8 @@ export interface AchievementCardProps {
   status: AchievementStatus;
   /** Optional unlock timestamp label. */
   unlockedLabel?: string;
+  /** Optional progress text when locked (e.g. 47/100). */
+  progressLabel?: string;
   /** Glyph for the card. */
   iconName?: IconName;
 }
@@ -35,6 +37,7 @@ const AchievementCard = memo(
     description,
     status,
     unlockedLabel,
+    progressLabel,
     iconName = 'achievements',
   }: AchievementCardProps) => {
     const { theme } = useTheme();
@@ -42,7 +45,7 @@ const AchievementCard = memo(
     const styles = useMemo(() => createStyles(theme, locked), [theme, locked]);
 
     const a11y = locked
-      ? `${name}, ${STRINGS.ACHIEVEMENT_LOCKED}`
+      ? `${name}, ${STRINGS.ACHIEVEMENT_LOCKED}${progressLabel ? `, ${progressLabel}` : ''}`
       : `${name}, ${STRINGS.ACHIEVEMENT_UNLOCKED}${unlockedLabel ? `, ${unlockedLabel}` : ''}`;
 
     return (
@@ -57,6 +60,11 @@ const AchievementCard = memo(
         <Text style={styles.description} allowFontScaling={false}>
           {description}
         </Text>
+        {locked && progressLabel ? (
+          <Text style={styles.meta} allowFontScaling={false}>
+            {progressLabel}
+          </Text>
+        ) : null}
         {!locked && unlockedLabel ? (
           <Text style={styles.meta} allowFontScaling={false}>
             {unlockedLabel}

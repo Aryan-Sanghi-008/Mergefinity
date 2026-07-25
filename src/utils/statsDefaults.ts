@@ -9,6 +9,18 @@ import type { GameMode, GameStats, LifetimeStats } from '@/types';
 const MODES: GameMode[] = ['classic', 'endless', 'challenge', 'time-attack'];
 
 /**
+ * Empty modesWon map for lifetime stats / achievements.
+ */
+export function createEmptyModesWon(): Record<GameMode, boolean> {
+  return {
+    classic: false,
+    endless: false,
+    challenge: false,
+    'time-attack': false,
+  };
+}
+
+/**
  * Empty per-mode stats row.
  */
 export function createEmptyGameStats(mode: GameMode): GameStats {
@@ -38,6 +50,8 @@ export function createEmptyLifetimeStats(): LifetimeStats {
     currentPlayStreakDays: 0,
     longestPlayStreakDays: 0,
     lastPlayDayKey: null,
+    consecutiveLosses: 0,
+    modesWon: createEmptyModesWon(),
     mergeHistogram: {},
   };
 }
