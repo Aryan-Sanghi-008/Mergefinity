@@ -4,13 +4,14 @@
     "slug": "mergefinity",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/images/icon.png",
+    "icon": "./assets/icon.png",
     "scheme": "mergefinity",
     "userInterfaceStyle": "light",
     "jsEngine": "hermes",
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/icon-adaptive-fg.png",
+        "backgroundImage": "./assets/icon-adaptive-bg.png",
         "backgroundColor": "#FAF8EF"
       },
       "package": "com.mergefinity.app",
@@ -28,9 +29,9 @@
       [
         "expo-splash-screen",
         {
-          "image": "./src/assets/images/splash-icon.png",
+          "image": "./assets/splash.png",
           "resizeMode": "contain",
-          "backgroundColor": "#FAF8EF"
+          "backgroundColor": "#BBADA0"
         }
       ]
     ],

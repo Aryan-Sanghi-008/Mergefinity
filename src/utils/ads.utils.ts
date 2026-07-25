@@ -81,11 +81,16 @@ async function persistLossCounter(): Promise<void> {
 
 /**
  * Ensure consent is resolved before any ad. Returns whether personalized allowed.
+ * P-19: do not prompt until the player has completed at least one game.
  */
 export async function ensureConsentResolved(): Promise<AdsConsentStatus> {
   await hydrate();
   if (consentStatus !== 'unset') {
     return consentStatus;
+  }
+  const totalGames = useStatsStore.getState().lifetime.totalGames;
+  if (totalGames < 1) {
+    return 'unset';
   }
   const decision =
     consentPrompter !== null
@@ -96,14 +101,20 @@ export async function ensureConsentResolved(): Promise<AdsConsentStatus> {
 }
 
 /**
- * @returns Whether banners may render (not removed, consent resolved).
+ * @returns Whether banners may render (not removed, consent resolved, post first game).
  */
 export async function isBannerAllowed(): Promise<boolean> {
   await hydrate();
   if (usePurchaseStore.getState().hasRemovedAds) {
     return false;
   }
-  await ensureConsentResolved();
+  if (useStatsStore.getState().lifetime.totalGames < 1) {
+    return false;
+  }
+  const status = await ensureConsentResolved();
+  if (status === 'unset') {
+    return false;
+  }
   return !usePurchaseStore.getState().hasRemovedAds;
 }
 

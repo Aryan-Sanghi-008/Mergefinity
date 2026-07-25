@@ -1,44 +1,29 @@
 /**
- * @file about.tsx
+ * @file changelog.tsx
  * @layer app
- * @description About — version, build, credits, privacy, changelog (P-14 / P-19).
+ * @description In-app changelog from constants (P-19).
  */
 
-import Constants from 'expo-constants';
-import { Stack, useRouter, type Href } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { memo, useCallback, useMemo } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { SettingsLinkRow } from '@/components/molecules';
-import { PRIVACY_POLICY_URL, STRINGS } from '@/constants';
+import { CHANGELOG_ENTRIES, STRINGS } from '@/constants';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, TYPOGRAPHY, type ThemeTokens } from '@/styles';
 
 /**
- * About screen — thin info sheet from Settings INFO.
+ * Changelog modal — curated release notes.
  */
-const AboutScreen = memo(() => {
+const ChangelogScreen = memo(() => {
   const { theme } = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
-  const appVersion =
-    Constants.expoConfig?.version ?? Constants.nativeAppVersion ?? '1.0.0';
-  const buildNumber =
-    Constants.nativeBuildVersion ?? Constants.expoConfig?.ios?.buildNumber;
-
   const onBack = useCallback(() => {
     router.back();
-  }, [router]);
-
-  const onPrivacy = useCallback(() => {
-    void Linking.openURL(PRIVACY_POLICY_URL);
-  }, []);
-
-  const onChangelog = useCallback(() => {
-    router.push('/changelog' as Href);
   }, [router]);
 
   return (
@@ -64,37 +49,32 @@ const AboutScreen = memo(() => {
           </Text>
         </Pressable>
         <Text style={styles.title} allowFontScaling={false}>
-          {STRINGS.ABOUT_TITLE}
+          {STRINGS.CHANGELOG_TITLE}
         </Text>
       </View>
 
-      <Text style={styles.credits} allowFontScaling={false}>
-        {STRINGS.ABOUT_CREDITS}
-      </Text>
-      <Text style={styles.meta} allowFontScaling={false}>
-        {`${STRINGS.SETTINGS_VERSION} ${appVersion}`}
-      </Text>
-      {buildNumber ? (
-        <Text style={styles.meta} allowFontScaling={false}>
-          {`${STRINGS.ABOUT_BUILD_PREFIX}${buildNumber}`}
-        </Text>
-      ) : null}
-
-      <View style={styles.section}>
-        <SettingsLinkRow
-          label={STRINGS.ABOUT_CHANGELOG}
-          onPress={onChangelog}
-        />
-        <SettingsLinkRow
-          label={STRINGS.SETTINGS_PRIVACY}
-          onPress={onPrivacy}
-        />
-      </View>
+      <ScrollView contentContainerStyle={styles.scroll}>
+        {CHANGELOG_ENTRIES.map((entry) => (
+          <View key={entry.version} style={styles.entry}>
+            <Text style={styles.version} allowFontScaling={false}>
+              {`v${entry.version}`}
+            </Text>
+            <Text style={styles.date} allowFontScaling={false}>
+              {entry.date}
+            </Text>
+            {entry.highlights.map((line) => (
+              <Text key={line} style={styles.bullet} allowFontScaling={false}>
+                {`• ${line}`}
+              </Text>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 });
 
-AboutScreen.displayName = 'AboutScreen';
+ChangelogScreen.displayName = 'ChangelogScreen';
 
 function createStyles(theme: ThemeTokens) {
   return StyleSheet.create({
@@ -124,21 +104,27 @@ function createStyles(theme: ThemeTokens) {
       color: theme.TEXT_PRIMARY,
       flex: 1,
     },
-    credits: {
-      ...TYPOGRAPHY.body,
-      color: theme.TEXT_PRIMARY,
-      marginBottom: SPACING_TOKENS.md,
+    scroll: {
+      gap: SPACING_TOKENS.lg,
+      paddingBottom: SPACING_TOKENS.xl,
     },
-    meta: {
-      ...TYPOGRAPHY.body,
+    entry: {
+      gap: SPACING_TOKENS.xs,
+    },
+    version: {
+      ...TYPOGRAPHY.title,
+      color: theme.TEXT_PRIMARY,
+    },
+    date: {
+      ...TYPOGRAPHY.scoreLabel,
       color: theme.TEXT_MUTED,
       marginBottom: SPACING_TOKENS.xs,
     },
-    section: {
-      marginTop: SPACING_TOKENS.xl,
-      gap: SPACING_TOKENS.xs,
+    bullet: {
+      ...TYPOGRAPHY.body,
+      color: theme.TEXT_PRIMARY,
     },
   });
 }
 
-export default AboutScreen;
+export default ChangelogScreen;

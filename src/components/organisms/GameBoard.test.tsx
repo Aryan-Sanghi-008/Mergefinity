@@ -21,8 +21,11 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 );
 
 jest.mock('react-native-gesture-handler', () => {
+  // Jest mock factories cannot use ESM imports.
+  /* eslint-disable @typescript-eslint/no-require-imports -- jest.mock factory */
   const React = require('react');
   const { View: RNView } = require('react-native');
+  /* eslint-enable @typescript-eslint/no-require-imports */
   return {
     GestureHandlerRootView: ({ children }: { children: React.ReactNode }) =>
       React.createElement(RNView, null, children),

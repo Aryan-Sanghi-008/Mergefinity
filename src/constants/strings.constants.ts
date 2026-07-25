@@ -95,7 +95,21 @@ export const STRINGS = {
   ABOUT_CREDITS:
     'Mergefinity — a focused 2048-style puzzle. Built with Expo and React Native.',
   ABOUT_BUILD_PREFIX: 'Build ',
+  ABOUT_CHANGELOG: 'Changelog',
   ABOUT_PRIVACY_STUB: 'Privacy policy URL will ship with store release.',
+
+  // Onboarding (P-19)
+  ONBOARDING_TITLE: 'Swipe to merge',
+  ONBOARDING_BODY: 'Slide tiles in any direction. Matching numbers combine.',
+  ONBOARDING_HINT: 'Swipe the board to begin',
+
+  // Error boundary (P-19)
+  ERROR_BOUNDARY_TITLE: 'Something went wrong',
+  ERROR_BOUNDARY_BODY: 'The game hit an unexpected error. You can restart the board.',
+  ERROR_BOUNDARY_RESTART: 'Restart game',
+
+  // Changelog
+  CHANGELOG_TITLE: 'Changelog',
 
   // Themes
   THEMES_TITLE: 'Themes',

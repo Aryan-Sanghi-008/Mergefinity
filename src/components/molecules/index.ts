@@ -27,6 +27,9 @@ export type { MergeBarProps } from './MergeBar';
 export { ModeSelector } from './ModeSelector';
 export type { ModeSelectorProps } from './ModeSelector';
 
+export { OnboardingOverlay } from './OnboardingOverlay';
+export type { OnboardingOverlayProps } from './OnboardingOverlay';
+
 export { PurchaseSheet } from './PurchaseSheet';
 export type {
   PurchaseSheetProps,

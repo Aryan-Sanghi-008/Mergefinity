@@ -13,6 +13,9 @@ export type { BoardTileLayerProps } from './BoardTileLayer';
 export { GameBoard } from './GameBoard';
 export type { GameBoardProps } from './GameBoard';
 
+export { GameErrorBoundary } from './GameErrorBoundary';
+export type { GameErrorBoundaryProps } from './GameErrorBoundary';
+
 export { GameControls } from './GameControls';
 export type { GameControlsProps } from './GameControls';
 

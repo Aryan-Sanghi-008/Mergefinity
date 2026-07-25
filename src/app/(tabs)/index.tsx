@@ -1,7 +1,7 @@
 /**
  * @file index.tsx
  * @layer app
- * @description Game screen — modes, board, timer, overlays (P-10 / P-14 / P-17).
+ * @description Game screen — modes, board, timer, overlays, onboarding (P-10 / P-14 / P-19).
  */
 
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -16,14 +16,22 @@ import {
   ConfirmDialog,
   GameOverOverlay,
   ModeSelector,
+  OnboardingOverlay,
   WinOverlay,
 } from '@/components/molecules';
-import { GameBoard, GameControls, GameHeader } from '@/components/organisms';
+import {
+  GameBoard,
+  GameControls,
+  GameErrorBoundary,
+  GameHeader,
+} from '@/components/organisms';
 import { STRINGS } from '@/constants';
 import { useGameEngine } from '@/hooks/useGameEngine';
 import { useGameMode } from '@/hooks/useGameMode';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, type ThemeTokens } from '@/styles';
+import type { Direction } from '@/types';
 
 const KEEP_AWAKE_TAG = 'mergefinity-game';
 
@@ -36,6 +44,7 @@ const GameScreen = memo(() => {
   const insets = useSafeAreaInsets();
   const game = useGameEngine();
   const modeApi = useGameMode();
+  const onboarding = useOnboarding();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   const winTitle = game.isTimeUpWin ? STRINGS.TIME_UP_TITLE : STRINGS.WIN_TITLE;
@@ -44,6 +53,16 @@ const GameScreen = memo(() => {
   const onSettingsPress = useCallback(() => {
     router.push('/settings');
   }, [router]);
+
+  const onSwipe = useCallback(
+    (direction: Direction) => {
+      if (onboarding.showOnboarding) {
+        void onboarding.completeOnboarding();
+      }
+      game.onMove(direction);
+    },
+    [game, onboarding],
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -55,72 +74,79 @@ const GameScreen = memo(() => {
   );
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: insets.top + SPACING_TOKENS.sm,
-        },
-      ]}
+    <GameErrorBoundary
+      surfaceColor={theme.SURFACE}
+      textColor={theme.TEXT_PRIMARY}
+      mutedColor={theme.TEXT_MUTED}
     >
-      <GameHeader
-        score={game.scoreValue}
-        bestScore={game.bestScoreValue}
-        scoreDeltaAmount={game.scoreDelta.amount}
-        scoreDeltaVisible={game.scoreDelta.visible}
-        scoreDeltaStyle={game.scoreDelta.animatedStyle as object}
-        onSettingsPress={onSettingsPress}
-      />
-      <ModeSelector
-        selected={modeApi.mode}
-        onSelect={modeApi.requestModeChange}
-      />
-      {game.hasTimer ? (
-        <View style={styles.timerRow}>
-          <TimerReadout remainingMs={game.timerRemaining} />
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: insets.top + SPACING_TOKENS.sm,
+          },
+        ]}
+      >
+        <GameHeader
+          score={game.scoreValue}
+          bestScore={game.bestScoreValue}
+          scoreDeltaAmount={game.scoreDelta.amount}
+          scoreDeltaVisible={game.scoreDelta.visible}
+          scoreDeltaStyle={game.scoreDelta.animatedStyle as object}
+          onSettingsPress={onSettingsPress}
+        />
+        <ModeSelector
+          selected={modeApi.mode}
+          onSelect={modeApi.requestModeChange}
+        />
+        {game.hasTimer ? (
+          <View style={styles.timerRow}>
+            <TimerReadout remainingMs={game.timerRemaining} />
+          </View>
+        ) : null}
+        <View style={styles.boardSlot}>
+          <GameBoard
+            tiles={game.tiles}
+            onSwipe={onSwipe}
+            animationLock={game.animationLock}
+            edgePulseStyle={game.edgePulse.animatedStyle}
+            cellCount={game.cellCount}
+          />
         </View>
-      ) : null}
-      <View style={styles.boardSlot}>
-        <GameBoard
-          tiles={game.tiles}
-          onSwipe={game.onMove}
-          animationLock={game.animationLock}
-          edgePulseStyle={game.edgePulse.animatedStyle}
-          cellCount={game.cellCount}
+        <GameControls
+          onNewGame={game.onNewGame}
+          onUndo={game.onUndo}
+          undoDisabled={game.undoDisabled}
+          {...(game.undoRemaining > 0 ? { undoRemaining: game.undoRemaining } : {})}
+        />
+        <OnboardingOverlay visible={onboarding.showOnboarding} />
+        <WinOverlay
+          visible={game.status === 'won'}
+          title={winTitle}
+          subtitle={winSub}
+          showContinue={!game.isTimeUpWin}
+          {...(!game.isTimeUpWin ? { onContinue: game.onContinue } : {})}
+          onNewGame={game.onNewGame}
+        />
+        <GameOverOverlay
+          visible={game.status === 'lost'}
+          finalScore={game.score}
+          onTryAgain={game.onNewGame}
+          onNewGame={game.onNewGame}
+        />
+        <ConfirmDialog
+          visible={modeApi.pendingMode !== null}
+          title={STRINGS.MODE_SWITCH_CONFIRM}
+          message={STRINGS.MODE_SWITCH_CONFIRM_SUB}
+          onConfirm={modeApi.confirmModeChange}
+          onCancel={modeApi.cancelModeChange}
+        />
+        <AchievementToast
+          achievementId={game.achievementToastId}
+          onDismiss={game.onAchievementToastDismiss}
         />
       </View>
-      <GameControls
-        onNewGame={game.onNewGame}
-        onUndo={game.onUndo}
-        undoDisabled={game.undoDisabled}
-        {...(game.undoRemaining > 0 ? { undoRemaining: game.undoRemaining } : {})}
-      />
-      <WinOverlay
-        visible={game.status === 'won'}
-        title={winTitle}
-        subtitle={winSub}
-        showContinue={!game.isTimeUpWin}
-        {...(!game.isTimeUpWin ? { onContinue: game.onContinue } : {})}
-        onNewGame={game.onNewGame}
-      />
-      <GameOverOverlay
-        visible={game.status === 'lost'}
-        finalScore={game.score}
-        onTryAgain={game.onNewGame}
-        onNewGame={game.onNewGame}
-      />
-      <ConfirmDialog
-        visible={modeApi.pendingMode !== null}
-        title={STRINGS.MODE_SWITCH_CONFIRM}
-        message={STRINGS.MODE_SWITCH_CONFIRM_SUB}
-        onConfirm={modeApi.confirmModeChange}
-        onCancel={modeApi.cancelModeChange}
-      />
-      <AchievementToast
-        achievementId={game.achievementToastId}
-        onDismiss={game.onAchievementToastDismiss}
-      />
-    </View>
+    </GameErrorBoundary>
   );
 });
 
@@ -133,6 +159,7 @@ function createStyles(theme: ThemeTokens) {
       flexDirection: 'column',
       backgroundColor: theme.SURFACE,
       gap: SPACING_TOKENS.sm,
+      position: 'relative',
     },
     timerRow: {
       alignItems: 'center',

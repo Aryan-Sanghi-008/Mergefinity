@@ -4,13 +4,20 @@
  * @description Interstitial eligibility and consent gates (P-16).
  */
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { INTERSTITIAL_EVERY_N_LOSSES } from '@/constants';
 import { usePurchaseStore } from '@/store/purchaseStore';
+import { useStatsStore } from '@/store/statsStore';
 import {
+  ensureConsentResolved,
+  getAdsDebugStateForTests,
+  isBannerAllowed,
   isInterstitialEligible,
   preloadInterstitial,
   resetAdsStateForTests,
   setConsentForTests,
+  setConsentPrompter,
   setLossCounterForTests,
   showInterstitialIfEligible,
 } from '@/utils/ads.utils';
@@ -71,6 +78,7 @@ describe('isInterstitialEligible', () => {
 describe('showInterstitialIfEligible', () => {
   beforeEach(async () => {
     resetAdsStateForTests();
+    await AsyncStorage.clear();
     usePurchaseStore.setState({
       hasRemovedAds: false,
       hasPremiumThemes: false,
@@ -95,5 +103,45 @@ describe('showInterstitialIfEligible', () => {
       priorTotalGames: 2,
     });
     expect(result).toBe('skipped');
+  });
+});
+
+describe('consent after first completed game (P-19)', () => {
+  beforeEach(async () => {
+    resetAdsStateForTests();
+    await AsyncStorage.clear();
+    usePurchaseStore.setState({
+      hasRemovedAds: false,
+      hasPremiumThemes: false,
+    });
+    useStatsStore.setState({
+      lifetime: {
+        ...useStatsStore.getState().lifetime,
+        totalGames: 0,
+      },
+    });
+  });
+
+  it('does not prompt or allow banners before first game', async () => {
+    const prompter = jest.fn(async () => 'personalized' as const);
+    setConsentPrompter(prompter);
+    await expect(ensureConsentResolved()).resolves.toBe('unset');
+    expect(prompter).not.toHaveBeenCalled();
+    await expect(isBannerAllowed()).resolves.toBe(false);
+    expect(getAdsDebugStateForTests().consentStatus).toBe('unset');
+  });
+
+  it('prompts once a game has been completed', async () => {
+    useStatsStore.setState({
+      lifetime: {
+        ...useStatsStore.getState().lifetime,
+        totalGames: 1,
+      },
+    });
+    const prompter = jest.fn(async () => 'non_personalized' as const);
+    setConsentPrompter(prompter);
+    await expect(ensureConsentResolved()).resolves.toBe('non_personalized');
+    expect(prompter).toHaveBeenCalledTimes(1);
+    await expect(isBannerAllowed()).resolves.toBe(true);
   });
 });

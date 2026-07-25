@@ -21,6 +21,11 @@ export {
 export { STRINGS } from './strings.constants';
 export type { StringKey } from './strings.constants';
 
+export { PRIVACY_POLICY_URL } from './urls.constants';
+
+export { CHANGELOG_ENTRIES } from './changelog.constants';
+export type { ChangelogEntry } from './changelog.constants';
+
 export {
   GAME_MODES,
   MODE_CONFIG,
