@@ -6,6 +6,7 @@
 
 import { memo, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   MergeBar,
@@ -23,6 +24,7 @@ import { SPACING_TOKENS, TYPOGRAPHY, type ThemeTokens } from '@/styles';
  */
 const StatisticsScreen = memo(() => {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const {
     selectedMode,
@@ -37,7 +39,10 @@ const StatisticsScreen = memo(() => {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top + SPACING_TOKENS.SCREEN_PADDING },
+      ]}
       accessibilityLabel={STRINGS.STATS_TITLE}
     >
       <Text style={styles.title} allowFontScaling={false}>
@@ -176,7 +181,7 @@ function createStyles(theme: ThemeTokens) {
       backgroundColor: theme.SURFACE,
     },
     content: {
-      padding: SPACING_TOKENS.SCREEN_PADDING,
+      paddingHorizontal: SPACING_TOKENS.SCREEN_PADDING,
       paddingBottom: SPACING_TOKENS.xl * SPACING_TOKENS.LAYOUT_DOUBLE,
       gap: SPACING_TOKENS.md,
     },

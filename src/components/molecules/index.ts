@@ -34,6 +34,9 @@ export type { ScorePanelProps } from './ScorePanel';
 export { SessionCard } from './SessionCard';
 export type { SessionCardProps } from './SessionCard';
 
+export { SettingsLinkRow } from './SettingsLinkRow';
+export type { SettingsLinkRowProps } from './SettingsLinkRow';
+
 export { SettingsToggleRow } from './SettingsToggleRow';
 export type { SettingsToggleRowProps } from './SettingsToggleRow';
 

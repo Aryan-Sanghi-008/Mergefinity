@@ -6,6 +6,7 @@
 
 import { memo, useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AchievementCard } from '@/components/molecules';
 import { STRINGS } from '@/constants';
@@ -20,11 +21,17 @@ const COLUMN_COUNT = 2;
  */
 const AchievementsScreen = memo(() => {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { items, unlockedCount, totalCount } = useAchievements();
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top + SPACING_TOKENS.sm },
+      ]}
+    >
       <View style={styles.header}>
         <Text style={styles.title} allowFontScaling={false}>
           {STRINGS.ACHIEVEMENTS_TITLE}

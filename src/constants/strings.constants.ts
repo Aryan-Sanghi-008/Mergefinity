@@ -64,6 +64,15 @@ export const STRINGS = {
   SETTINGS_RESET_STATS: 'Reset statistics',
   SETTINGS_RESET_STATS_CONFIRM_TITLE: 'Reset statistics?',
   SETTINGS_RESET_STATS_CONFIRM: 'Clear all statistics? Best scores are kept.',
+  SETTINGS_COMING_SOON_TITLE: 'Coming soon',
+  SETTINGS_COMING_SOON_BODY: 'This will be available in a later update.',
+
+  // About
+  ABOUT_TITLE: 'About',
+  ABOUT_CREDITS:
+    'Mergefinity — a focused 2048-style puzzle. Built with Expo and React Native.',
+  ABOUT_BUILD_PREFIX: 'Build ',
+  ABOUT_PRIVACY_STUB: 'Privacy policy URL will ship with store release.',
 
   // Themes
   THEMES_TITLE: 'Themes',

@@ -1,11 +1,13 @@
 /**
  * @file index.tsx
  * @layer app
- * @description Game screen — modes, board, timer, overlays (P-10).
+ * @description Game screen — modes, board, timer, overlays (P-10 / P-14).
  */
 
-import { memo, useMemo } from 'react';
+import { useRouter } from 'expo-router';
+import { memo, useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TimerReadout } from '@/components/atoms';
 import {
@@ -27,6 +29,8 @@ import { SPACING_TOKENS, type ThemeTokens } from '@/styles';
  */
 const GameScreen = memo(() => {
   const { theme } = useTheme();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
   const game = useGameEngine();
   const modeApi = useGameMode();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -34,14 +38,26 @@ const GameScreen = memo(() => {
   const winTitle = game.isTimeUpWin ? STRINGS.TIME_UP_TITLE : STRINGS.WIN_TITLE;
   const winSub = game.isTimeUpWin ? STRINGS.TIME_UP_SUB : STRINGS.WIN_SUB;
 
+  const onSettingsPress = useCallback(() => {
+    router.push('/settings');
+  }, [router]);
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top + SPACING_TOKENS.sm,
+        },
+      ]}
+    >
       <GameHeader
         score={game.scoreValue}
         bestScore={game.bestScoreValue}
         scoreDeltaAmount={game.scoreDelta.amount}
         scoreDeltaVisible={game.scoreDelta.visible}
         scoreDeltaStyle={game.scoreDelta.animatedStyle as object}
+        onSettingsPress={onSettingsPress}
       />
       <ModeSelector
         selected={modeApi.mode}
@@ -104,7 +120,6 @@ function createStyles(theme: ThemeTokens) {
       flex: 1,
       flexDirection: 'column',
       backgroundColor: theme.SURFACE,
-      paddingVertical: SPACING_TOKENS.sm,
       gap: SPACING_TOKENS.sm,
     },
     timerRow: {

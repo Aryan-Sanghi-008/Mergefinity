@@ -1,7 +1,7 @@
 /**
  * @file _layout.tsx
  * @layer app
- * @description Root layout — GestureHandlerRootView, ThemeProvider, stack.
+ * @description Root layout — GestureHandlerRootView, ThemeProvider, stack (P-14).
  */
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack } from 'expo-router';
@@ -29,7 +29,14 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.root}>
       <ThemeProvider>
         <ThemedStatusBar />
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="about" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="themes" />
+          <Stack.Screen name="theme-lab" />
+          <Stack.Screen name="game" />
+        </Stack>
       </ThemeProvider>
     </GestureHandlerRootView>
   );

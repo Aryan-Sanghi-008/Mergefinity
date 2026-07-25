@@ -776,9 +776,9 @@ app/themes.tsx
 
 ### Definition of Done
 
-- [ ] Navigating to Statistics and back to Game never resets the board or score
-- [ ] All screens render correctly behind the system status bar on notch devices
-- [ ] Settings screen is accessible within 2 taps from the game screen
+- [x] Navigating to Statistics and back to Game never resets the board or score
+- [x] All screens render correctly behind the system status bar on notch devices
+- [x] Settings screen is accessible within 2 taps from the game screen
 
 ---
 

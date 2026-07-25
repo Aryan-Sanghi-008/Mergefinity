@@ -7,6 +7,7 @@
 import { Stack, useRouter } from 'expo-router';
 import { memo, useCallback, useMemo } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PurchaseSheet, ThemePreviewCard } from '@/components/molecules';
 import { STRINGS } from '@/constants';
@@ -32,6 +33,7 @@ const THEME_LABELS: Record<ThemeName, string> = {
 const ThemesScreen = memo(() => {
   const { theme } = useTheme();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const {
     savedTheme,
@@ -48,7 +50,15 @@ const ThemesScreen = memo(() => {
   }, [router]);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top + SPACING_TOKENS.sm,
+          paddingBottom: insets.bottom,
+        },
+      ]}
+    >
       <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.header}>
         <Pressable
@@ -108,7 +118,6 @@ function createStyles(theme: ThemeTokens) {
       flex: 1,
       backgroundColor: theme.SURFACE,
       paddingHorizontal: SPACING_TOKENS.SCREEN_PADDING,
-      paddingTop: SPACING_TOKENS.xl,
     },
     header: {
       flexDirection: 'row',

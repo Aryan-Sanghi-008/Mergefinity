@@ -1,7 +1,7 @@
 /**
  * @file _layout.tsx
  * @layer app
- * @description Tab navigator layout for game and settings screens.
+ * @description Tab navigator — Game / Statistics / Achievements (P-14).
  */
 import { Tabs } from 'expo-router';
 import { useMemo } from 'react';
@@ -21,16 +21,20 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: styles.header,
-        headerTintColor: theme.TEXT_PRIMARY,
+        headerShown: false,
         tabBarActiveTintColor: theme.BUTTON_BG,
         tabBarInactiveTintColor: theme.TEXT_MUTED,
         tabBarStyle: styles.tabBar,
+        freezeOnBlur: true,
       }}
     >
       <Tabs.Screen
         name="index"
-        options={{ title: STRINGS.GAME_TITLE, tabBarLabel: STRINGS.TAB_GAME }}
+        options={{
+          title: STRINGS.GAME_TITLE,
+          tabBarLabel: STRINGS.TAB_GAME,
+          lazy: false,
+        }}
       />
       <Tabs.Screen
         name="statistics"
@@ -46,19 +50,12 @@ export default function TabsLayout() {
           tabBarLabel: STRINGS.TAB_ACHIEVEMENTS,
         }}
       />
-      <Tabs.Screen
-        name="settings"
-        options={{ title: STRINGS.SETTINGS_TITLE, tabBarLabel: STRINGS.TAB_SETTINGS }}
-      />
     </Tabs>
   );
 }
 
 function createStyles(theme: ThemeTokens) {
   return StyleSheet.create({
-    header: {
-      backgroundColor: theme.SURFACE,
-    },
     tabBar: {
       backgroundColor: theme.SURFACE,
       borderTopColor: theme.DIVIDER,

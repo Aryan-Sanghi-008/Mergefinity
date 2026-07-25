@@ -6,6 +6,7 @@
 import { router } from 'expo-router';
 import { memo, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { STRINGS } from '@/constants';
 import { useTheme } from '@/hooks/useTheme';
@@ -36,10 +37,19 @@ const PREVIEW_MAX = THEME_LAB_PREVIEW_VALUES[3]!;
  */
 const ThemeLabScreen = memo(() => {
   const { theme, themeName, setThemeName } = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        {
+          paddingTop: insets.top + SPACING_TOKENS.SCREEN_PADDING,
+          paddingBottom: insets.bottom + SPACING_TOKENS.SCREEN_PADDING,
+        },
+      ]}
+    >
       <Pressable
         onPress={() => router.back()}
         accessibilityRole="button"
@@ -127,8 +137,7 @@ function createStyles(theme: ThemeTokens) {
     container: {
       flexGrow: 1,
       backgroundColor: theme.SURFACE,
-      padding: SPACING_TOKENS.SCREEN_PADDING,
-      paddingTop: SPACING_TOKENS.xl,
+      paddingHorizontal: SPACING_TOKENS.SCREEN_PADDING,
     },
     back: {
       minHeight: SPACING_TOKENS.TAP_TARGET_MIN,
