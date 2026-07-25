@@ -1,7 +1,7 @@
 /**
  * @file index.tsx
  * @layer app
- * @description Game screen — animated board, swipe, overlays (P-07).
+ * @description Game screen — composes organisms via useGameEngine (P-09).
  */
 
 import { memo, useMemo } from 'react';
@@ -9,16 +9,16 @@ import { StyleSheet, View } from 'react-native';
 
 import { GameOverOverlay, WinOverlay } from '@/components/molecules';
 import { GameBoard, GameControls, GameHeader } from '@/components/organisms';
-import { useDemoGame } from '@/hooks/useDemoGame';
+import { useGameEngine } from '@/hooks/useGameEngine';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, type ThemeTokens } from '@/styles';
 
 /**
- * Home / game screen — composes organisms; state via `useDemoGame` until P-09.
+ * Home / game screen — zero game logic; store via `useGameEngine`.
  */
 const GameScreen = memo(() => {
   const { theme } = useTheme();
-  const game = useDemoGame();
+  const game = useGameEngine();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (

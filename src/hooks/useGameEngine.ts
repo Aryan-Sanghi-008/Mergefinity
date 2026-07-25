@@ -1,11 +1,10 @@
 /**
- * @file useDemoGame.ts
+ * @file useGameEngine.ts
  * @layer hooks
- * @description Playable demo session with slide→merge→spawn sequencing (P-07).
- *              Replaced by Zustand `useGameEngine` in P-09.
+ * @description Gesture → animate → gameStore commit bridge (P-09).
  */
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 
 import {
@@ -15,19 +14,14 @@ import {
   SPAWN_DELAY_MS,
   SPAWN_DURATION_MS,
 } from '@/constants';
-import {
-  createEmptyBoard,
-  isLost,
-  isWon,
-  resolveMove,
-  spawnTile,
-} from '@/engine';
+import { resolveMove, spawnTile } from '@/engine';
 import { useAnimationLock } from '@/hooks/useAnimationLock';
 import { useBoardShake } from '@/hooks/useBoardShake';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useScoreCounter } from '@/hooks/useScoreCounter';
 import { useScoreDelta } from '@/hooks/useScoreDelta';
-import type { Board, BoardTileEntity, Direction, GameStatus } from '@/types';
+import { useGameStore } from '@/store/gameStore';
+import type { BoardTileEntity, Direction, GameStatus } from '@/types';
 import { delay } from '@/utils/delay';
 import {
   hapticGameOver,
@@ -44,71 +38,65 @@ import {
   entitiesWithSpawn,
 } from '@/utils/tileEntities';
 
-/** Demo / pre-store game surface for the game screen. */
-export interface DemoGameState {
-  /** Engine board (post-move truth). */
-  board: Board;
-  /** Visual tile entities for AnimatedTile. */
+/** Game screen surface from the engine hook. */
+export interface GameEngineState {
+  /** Visual tile entities. */
   tiles: BoardTileEntity[];
-  /** Current score (number for logic). */
+  /** Current score. */
   score: number;
-  /** Rolling score shared value for ScoreValue. */
+  /** Rolling score shared value. */
   scoreValue: SharedValue<number>;
-  /** Best score number. */
+  /** Best score. */
   bestScore: number;
   /** Rolling best shared value. */
   bestScoreValue: SharedValue<number>;
-  /** Remaining undos (none until store history). */
+  /** Undos remaining this game. */
   undoRemaining: number;
-  /** Undo disabled until P-09. */
+  /** Undo control disabled. */
   undoDisabled: boolean;
-  /** Win / lose / playing status. */
+  /** Lifecycle status. */
   status: GameStatus;
-  /** True after first 2048 if player chose Keep Going. */
-  continuedAfterWin: boolean;
   /** Score delta float API. */
   scoreDelta: ReturnType<typeof useScoreDelta>;
   /** Edge pulse API. */
   edgePulse: ReturnType<typeof useBoardShake>;
-  /** Animation lock shared value for gestures. */
+  /** SharedValue lock for pan worklet. */
   animationLock: SharedValue<boolean>;
-  /** Swipe / move handler. */
+  /** Swipe handler. */
   onMove: (direction: Direction) => void;
-  /** Reseed a fresh two-tile board. */
+  /** New game. */
   onNewGame: () => void;
-  /** No-op until undo history exists. */
+  /** Undo. */
   onUndo: () => void;
-  /** Dismiss win overlay and keep playing. */
+  /** Keep going after win. */
   onContinue: () => void;
 }
 
-/** Deterministic RNG for opening seed only. */
-function demoRng(): number {
-  return 0;
-}
-
-function createDemoBoard(): Board {
-  let board = createEmptyBoard();
-  board = spawnTile(board, demoRng);
-  board = spawnTile(board, demoRng);
-  return board;
-}
-
 /**
- * Local playable game with animation sequencing until P-09 store lands.
+ * Authoritative play loop: store state + Reanimated tile sequencing.
  */
-export function useDemoGame(): DemoGameState {
-  const [opening] = useState(() => {
+export function useGameEngine(): GameEngineState {
+  const score = useGameStore((s) => s.score);
+  const bestScore = useGameStore((s) => s.bestScore);
+  const status = useGameStore((s) => s.status);
+  const undosRemaining = useGameStore((s) => s.undosRemaining);
+  const historyLength = useGameStore((s) => s.history.length);
+  const storeLock = useGameStore((s) => s.animationLock);
+
+  const commitMove = useGameStore((s) => s.commitMove);
+  const undo = useGameStore((s) => s.undo);
+  const restart = useGameStore((s) => s.restart);
+  const continueAfterWinAction = useGameStore((s) => s.continueAfterWin);
+  const setAnimationLock = useGameStore((s) => s.setAnimationLock);
+
+  const [tileSeed] = useState(() => {
     const createId = createTileIdFactory();
-    const openingBoard = createDemoBoard();
     return {
       createId,
-      board: openingBoard,
-      tiles: entitiesFromBoard(openingBoard, createId),
+      tiles: entitiesFromBoard(useGameStore.getState().board, createId),
     };
   });
-
-  const createIdRef = useRef(opening.createId);
+  const createIdRef = useRef(tileSeed.createId);
   const motionSeqRef = useRef(0);
   const busyRef = useRef(false);
   const reducedMotion = useReducedMotion();
@@ -116,53 +104,72 @@ export function useDemoGame(): DemoGameState {
   const scoreDelta = useScoreDelta();
   const edgePulse = useBoardShake();
 
-  const [board, setBoard] = useState(opening.board);
-  const [tiles, setTiles] = useState(opening.tiles);
-  const [score, setScore] = useState(0);
-  const [bestScore, setBestScore] = useState(0);
-  const [status, setStatus] = useState<GameStatus>('playing');
-  const [continuedAfterWin, setContinuedAfterWin] = useState(false);
-
+  const [tiles, setTiles] = useState(tileSeed.tiles);
   const scoreValue = useScoreCounter(score);
   const bestScoreValue = useScoreCounter(bestScore);
+
+  /** Mirror store lock ↔ SharedValue for gesture worklet. */
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue write
+    locked.value = storeLock;
+  }, [storeLock, locked]);
+
+  /** After persist rehydrate, rebuild tile entities from board. */
+  useEffect(() => {
+    const syncTiles = () => {
+      createIdRef.current = createTileIdFactory();
+      motionSeqRef.current = 0;
+      setTiles(entitiesFromBoard(useGameStore.getState().board, createIdRef.current));
+    };
+
+    if (useGameStore.persist.hasHydrated()) {
+      syncTiles();
+    }
+    return useGameStore.persist.onFinishHydration(syncTiles);
+  }, []);
 
   const phaseMs = useCallback(
     (ms: number) => (reducedMotion ? REDUCED_MOTION_DURATION_MS : ms),
     [reducedMotion],
   );
 
+  const resetTilesFromBoard = useCallback(() => {
+    createIdRef.current = createTileIdFactory();
+    motionSeqRef.current = 0;
+    setTiles(entitiesFromBoard(useGameStore.getState().board, createIdRef.current));
+  }, []);
+
   const onNewGame = useCallback(() => {
     busyRef.current = false;
     unlock();
-    createIdRef.current = createTileIdFactory();
-    motionSeqRef.current = 0;
-    const next = createDemoBoard();
-    setBoard(next);
-    setTiles(entitiesFromBoard(next, createIdRef.current));
-    setScore(0);
-    setStatus('playing');
-    setContinuedAfterWin(false);
-  }, [unlock]);
+    restart();
+    resetTilesFromBoard();
+  }, [unlock, restart, resetTilesFromBoard]);
 
   const onUndo = useCallback(() => {
-    // Undo requires snapshot history — wired in P-09.
-  }, []);
+    if (busyRef.current || locked.value) {
+      return;
+    }
+    undo();
+    resetTilesFromBoard();
+  }, [undo, resetTilesFromBoard, locked]);
 
   const onContinue = useCallback(() => {
-    setContinuedAfterWin(true);
-    setStatus('playing');
-  }, []);
+    continueAfterWinAction();
+  }, [continueAfterWinAction]);
 
   const onMove = useCallback(
     (direction: Direction) => {
-      if (busyRef.current || locked.value) {
+      if (busyRef.current || locked.value || storeLock) {
         return;
       }
-      if (status === 'lost' || status === 'won') {
+      const currentStatus = useGameStore.getState().status;
+      if (currentStatus === 'lost' || currentStatus === 'won') {
         return;
       }
 
-      const result = resolveMove(board, direction);
+      const currentBoard = useGameStore.getState().board;
+      const result = resolveMove(currentBoard, direction);
       if (!result.boardChanged) {
         edgePulse.pulse();
         return;
@@ -177,13 +184,12 @@ export function useDemoGame(): DemoGameState {
 
       busyRef.current = true;
       lock();
-      setStatus('animating');
+      setAnimationLock(true);
 
       void (async () => {
         try {
           motionSeqRef.current += 1;
           const seq = motionSeqRef.current;
-
           const slideTiles = entitiesForSlide(tiles, result.tileMoves, seq);
           setTiles(slideTiles);
           await delay(phaseMs(SLIDE_DURATION_MS));
@@ -212,25 +218,17 @@ export function useDemoGame(): DemoGameState {
 
           motionSeqRef.current += 1;
           setTiles(entitiesSettled(spawnTiles, motionSeqRef.current));
-          setBoard(afterSpawn);
 
-          const nextScore = score + result.scoreDelta;
-          setScore(nextScore);
+          commitMove({ board: afterSpawn, scoreDelta: result.scoreDelta });
           if (result.scoreDelta > 0) {
             scoreDelta.play(result.scoreDelta);
           }
-          if (nextScore > bestScore) {
-            setBestScore(nextScore);
-          }
 
-          if (!continuedAfterWin && isWon(afterSpawn)) {
+          const nextStatus = useGameStore.getState().status;
+          if (nextStatus === 'won') {
             hapticWin();
-            setStatus('won');
-          } else if (isLost(afterSpawn)) {
+          } else if (nextStatus === 'lost') {
             hapticGameOver();
-            setStatus('lost');
-          } else {
-            setStatus('playing');
           }
         } finally {
           unlock();
@@ -239,32 +237,30 @@ export function useDemoGame(): DemoGameState {
       })();
     },
     [
-      board,
       tiles,
-      score,
-      bestScore,
-      status,
-      continuedAfterWin,
       lock,
       unlock,
       locked,
+      storeLock,
+      setAnimationLock,
+      commitMove,
       edgePulse,
       scoreDelta,
       phaseMs,
     ],
   );
 
+  const undoDisabled = undosRemaining <= 0 || historyLength === 0 || status === 'animating';
+
   return {
-    board,
     tiles,
     score,
     scoreValue,
     bestScore,
     bestScoreValue,
-    undoRemaining: 0,
-    undoDisabled: true,
+    undoRemaining: undosRemaining,
+    undoDisabled,
     status,
-    continuedAfterWin,
     scoreDelta,
     edgePulse,
     animationLock: locked,

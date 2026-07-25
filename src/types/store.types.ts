@@ -1,10 +1,12 @@
 /**
  * @file store.types.ts
  * @layer types
- * @description Zustand game store state and action contracts.
+ * @description Zustand store state and action contracts.
  */
 
-import type { Board, Direction, GameMode, GameSnapshot, ThemeName } from './game.types';
+import type { Board, GameMode, GameSnapshot, ThemeName } from './game.types';
+import type { AchievementId, AchievementStatus } from './achievement.types';
+import type { GameStats, LifetimeStats, SessionRecord } from './stats.types';
 
 /**
  * Finite game status machine.
@@ -22,29 +24,45 @@ export interface GameState {
   bestScore: number;
   /** Lifecycle status. */
   status: GameStatus;
-  /** Undo stack (newest last). */
+  /** Undo stack (newest last), capped at MAX_UNDO_HISTORY. */
   history: GameSnapshot[];
-  /** Active play mode. */
+  /** Active play mode (`activeMode` in the game plan). */
   mode: GameMode;
   /** Undos remaining this game (mode / IAP dependent). */
   undosRemaining: number;
+  /** Moves completed this game (for snapshots). */
+  moveCount: number;
+  /** Player chose Keep Going after 2048. */
+  continuedAfterWin: boolean;
+  /** True while slide/merge/spawn runs (mirrored to SharedValue for gestures). */
+  animationLock: boolean;
+}
+
+/** Payload after animated slide→merge→spawn completes. */
+export interface CommitMovePayload {
+  /** Board after spawn. */
+  board: Board;
+  /** Points added this move. */
+  scoreDelta: number;
 }
 
 /** Imperative store actions. */
 export interface GameActions {
-  /** Resolve a swipe in `dir`. */
-  move: (dir: Direction) => void;
+  /** Apply a successful move after animation (history + score + win/lose). */
+  commitMove: (payload: CommitMovePayload) => void;
   /** Restore the previous snapshot when undos remain. */
   undo: () => void;
-  /** Start a fresh game in the current mode. */
+  /** Start a fresh game in the current mode (keeps bestScore). */
   restart: () => void;
   /** Dismiss win overlay and continue past 2048. */
   continueAfterWin: () => void;
-  /** Switch mode (may soft-restart). */
+  /** Switch mode (soft-restarts board). */
   setMode: (mode: GameMode) => void;
+  /** Sync animation lock for gestures / status. */
+  setAnimationLock: (locked: boolean) => void;
 }
 
-/** Combined Zustand store shape. */
+/** Combined Zustand game store shape. */
 export type GameStore = GameState & GameActions;
 
 /** Settings slice (persisted). */
@@ -73,3 +91,60 @@ export interface SettingsActions {
 
 /** Combined settings Zustand store. */
 export type SettingsStore = SettingsState & SettingsActions;
+
+/** Stats store state. */
+export interface StatsState {
+  /** Per-mode aggregates. */
+  byMode: Record<GameMode, GameStats>;
+  /** Cross-mode lifetime aggregates. */
+  lifetime: LifetimeStats;
+  /** Recent sessions (newest last, max 10). */
+  sessionHistory: SessionRecord[];
+}
+
+/** Stats store actions (wired richly in P-11). */
+export interface StatsActions {
+  /** Replace session history (capped). */
+  setSessionHistory: (sessions: SessionRecord[]) => void;
+  /** Reset lifetime + per-mode stats (keeps best scores elsewhere). */
+  resetStats: () => void;
+}
+
+/** Combined stats store. */
+export type StatsStore = StatsState & StatsActions;
+
+/** Achievement unlock map. */
+export interface AchievementState {
+  /** Status per achievement id. */
+  statuses: Record<AchievementId, AchievementStatus>;
+}
+
+/** Achievement store actions (P-12). */
+export interface AchievementActions {
+  /** Mark an achievement unlocked. */
+  unlock: (id: AchievementId) => void;
+  /** Reset all to locked. */
+  resetAchievements: () => void;
+}
+
+/** Combined achievement store. */
+export type AchievementStore = AchievementState & AchievementActions;
+
+/** IAP entitlements. */
+export interface PurchaseState {
+  /** Ads removed. */
+  hasRemovedAds: boolean;
+  /** Premium theme pack owned. */
+  hasPremiumThemes: boolean;
+}
+
+/** Purchase store actions (P-16). */
+export interface PurchaseActions {
+  /** Set ad-removal entitlement. */
+  setHasRemovedAds: (value: boolean) => void;
+  /** Set premium themes entitlement. */
+  setHasPremiumThemes: (value: boolean) => void;
+}
+
+/** Combined purchase store. */
+export type PurchaseStore = PurchaseState & PurchaseActions;

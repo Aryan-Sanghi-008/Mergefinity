@@ -12,7 +12,8 @@
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#FAF8EF"
       },
-      "package": "com.mergefinity.app"
+      "package": "com.mergefinity.app",
+      "allowBackup": true
     },
     "ios": {
       "supportsTablet": false,

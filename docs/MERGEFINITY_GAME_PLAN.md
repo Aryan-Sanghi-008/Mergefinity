@@ -503,7 +503,7 @@ app/_layout.tsx            (GestureHandlerRootView)
 
 | Store | State | Persisted |
 |-------|-------|-----------|
-| `gameStore` | board, score, bestScore, status, history (capped 3), activeMode, animationLock | `bestScore`, `activeMode` |
+| `gameStore` | board, score, bestScore, status, history (capped 3), activeMode, animationLock | Session (`board`, `score`, `status`, `history`, `undosRemaining`, `moveCount`, `continuedAfterWin`) + `bestScore`, `activeMode` — satisfies kill/resume DoD; `animationLock` ephemeral |
 | `settingsStore` | theme, hapticsEnabled, soundEnabled, boardSize | Everything |
 | `statsStore` | per-mode lifetime stats, sessionHistory (last 10) | Lifetime stats |
 | `achievementStore` | `Record<AchievementId, AchievementStatus>` | Everything |
@@ -536,9 +536,9 @@ src/hooks/useHighScore.ts
 
 ### Definition of Done
 
-- [ ] Killing the app mid-game and reopening shows the game at exactly the pre-kill board state
-- [ ] Best score persists across installs (Android backup enabled in `app.json`)
-- [ ] Undo correctly restores both board and score, and disables itself after 3 uses in one game
+- [x] Killing the app mid-game and reopening shows the game at exactly the pre-kill board state
+- [x] Best score persists across installs (Android backup enabled in `app.json`)
+- [x] Undo correctly restores both board and score, and disables itself after 3 uses in one game
 
 ---
 

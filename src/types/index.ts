@@ -18,13 +18,23 @@ export type {
 export type { RowTileMove, ShiftRowResult } from './board.types';
 
 export type {
+  AchievementActions,
+  AchievementState,
+  AchievementStore,
+  CommitMovePayload,
   GameActions,
   GameState,
   GameStatus,
   GameStore,
+  PurchaseActions,
+  PurchaseState,
+  PurchaseStore,
   SettingsActions,
   SettingsState,
   SettingsStore,
+  StatsActions,
+  StatsState,
+  StatsStore,
 } from './store.types';
 
 export type {

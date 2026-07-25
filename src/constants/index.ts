@@ -50,3 +50,5 @@ export {
 
 export { STORAGE_KEYS } from './storage.constants';
 export type { StorageKey } from './storage.constants';
+
+export { ACHIEVEMENT_IDS, MAX_SESSION_HISTORY } from './achievement.constants';

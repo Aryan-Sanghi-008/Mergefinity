@@ -12,22 +12,7 @@ import { BOARD_SIZE, STORAGE_KEYS } from '@/constants';
 import { DEFAULT_THEME_NAME } from '@/styles';
 import type { SettingsStore } from '@/types';
 
-const storeImpl = (
-  set: (
-    partial:
-      | Partial<SettingsStore>
-      | ((state: SettingsStore) => Partial<SettingsStore>),
-  ) => void,
-): SettingsStore => ({
-  theme: DEFAULT_THEME_NAME,
-  hapticsEnabled: true,
-  soundEnabled: true,
-  boardSize: BOARD_SIZE,
-  setHapticsEnabled: (enabled) => set({ hapticsEnabled: enabled }),
-  setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
-  setTheme: (theme) => set({ theme }),
-  setBoardSize: (boardSize) => set({ boardSize }),
-});
+import { analytics } from './middleware/analytics.middleware';
 
 /**
  * Settings store — everything persisted per game plan.
@@ -35,10 +20,22 @@ const storeImpl = (
  */
 export const useSettingsStore = create<SettingsStore>()(
   devtools(
-    persist(storeImpl, {
-      name: STORAGE_KEYS.SETTINGS,
-      storage: createJSONStorage(() => AsyncStorage),
-    }),
+    persist(
+      analytics((set) => ({
+        theme: DEFAULT_THEME_NAME,
+        hapticsEnabled: true,
+        soundEnabled: true,
+        boardSize: BOARD_SIZE,
+        setHapticsEnabled: (enabled) => set({ hapticsEnabled: enabled }),
+        setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
+        setTheme: (theme) => set({ theme }),
+        setBoardSize: (boardSize) => set({ boardSize }),
+      })),
+      {
+        name: STORAGE_KEYS.SETTINGS,
+        storage: createJSONStorage(() => AsyncStorage),
+      },
+    ),
     { name: 'settingsStore', enabled: __DEV__ },
   ),
 );
