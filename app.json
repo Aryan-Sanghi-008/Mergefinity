@@ -7,17 +7,20 @@
     "icon": "./src/assets/images/icon.png",
     "scheme": "mergefinity",
     "userInterfaceStyle": "light",
+    "jsEngine": "hermes",
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#FAF8EF"
       },
       "package": "com.mergefinity.app",
-      "allowBackup": true
+      "allowBackup": true,
+      "jsEngine": "hermes"
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.mergefinity.app"
+      "bundleIdentifier": "com.mergefinity.app",
+      "jsEngine": "hermes"
     },
     "plugins": [
       "expo-router",

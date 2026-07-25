@@ -23,7 +23,7 @@ export interface BoardDimensions {
   padding: number;
   /** Cells per axis. */
   cellCount: number;
-  /** Absolute left/top per flat index — computed once when size changes. */
+  /** Absolute left/top per flat index — tilePositions equivalent (P-17). */
   cellOffsets: readonly CellOffset[];
 }
 

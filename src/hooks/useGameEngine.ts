@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, type AppStateStatus } from 'react-native';
+import { AppState, InteractionManager, type AppStateStatus } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 import {
@@ -322,39 +322,51 @@ export function useGameEngine(): GameEngineState {
           const lossesBefore = useStatsStore.getState().lifetime.consecutiveLosses;
           const wasRecorded = useGameStore.getState().statsRecorded;
           const priorTotalGames = useStatsStore.getState().lifetime.totalGames;
-          commitMove({
-            board: afterSpawn,
-            scoreDelta: result.scoreDelta,
-            mergeValues: mergeValuesFromMoves(result.tileMoves),
-            direction,
-          });
-          if (result.scoreDelta > 0) {
-            scoreDelta.play(result.scoreDelta);
-          }
+          const mergeValues = mergeValuesFromMoves(result.tileMoves);
+          const scoreDeltaAmount = result.scoreDelta;
 
-          const next = useGameStore.getState();
-          const justWon =
-            next.statsRecorded && !wasRecorded && next.status === 'won';
-          const justLost =
-            next.statsRecorded && !wasRecorded && next.status === 'lost';
-          const unlocked = evaluateAchievements({
-            justWon,
-            justLost,
-            consecutiveLossesBeforeWin: lossesBefore,
-          });
-          enqueueAchievements(unlocked);
+          // Defer store writes until interactions/animations settle (P-17).
+          await new Promise<void>((resolve) => {
+            InteractionManager.runAfterInteractions(() => {
+              try {
+                commitMove({
+                  board: afterSpawn,
+                  scoreDelta: scoreDeltaAmount,
+                  mergeValues,
+                  direction,
+                });
+                if (scoreDeltaAmount > 0) {
+                  scoreDelta.play(scoreDeltaAmount);
+                }
 
-          if (next.status === 'won') {
-            hapticWin();
-          } else if (next.status === 'lost') {
-            hapticGameOver();
-            if (justLost) {
-              void showInterstitialIfEligible({
-                outcome: 'loss',
-                priorTotalGames,
-              });
-            }
-          }
+                const next = useGameStore.getState();
+                const justWon =
+                  next.statsRecorded && !wasRecorded && next.status === 'won';
+                const justLost =
+                  next.statsRecorded && !wasRecorded && next.status === 'lost';
+                const unlocked = evaluateAchievements({
+                  justWon,
+                  justLost,
+                  consecutiveLossesBeforeWin: lossesBefore,
+                });
+                enqueueAchievements(unlocked);
+
+                if (next.status === 'won') {
+                  hapticWin();
+                } else if (next.status === 'lost') {
+                  hapticGameOver();
+                  if (justLost) {
+                    void showInterstitialIfEligible({
+                      outcome: 'loss',
+                      priorTotalGames,
+                    });
+                  }
+                }
+              } finally {
+                resolve();
+              }
+            });
+          });
         } finally {
           unlock();
           busyRef.current = false;

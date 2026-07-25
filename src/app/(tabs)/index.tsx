@@ -1,10 +1,11 @@
 /**
  * @file index.tsx
  * @layer app
- * @description Game screen — modes, board, timer, overlays (P-10 / P-14).
+ * @description Game screen — modes, board, timer, overlays (P-10 / P-14 / P-17).
  */
 
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { memo, useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,6 +25,8 @@ import { useGameMode } from '@/hooks/useGameMode';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, type ThemeTokens } from '@/styles';
 
+const KEEP_AWAKE_TAG = 'mergefinity-game';
+
 /**
  * Home / game screen — zero game logic; hooks own store + motion.
  */
@@ -41,6 +44,15 @@ const GameScreen = memo(() => {
   const onSettingsPress = useCallback(() => {
     router.push('/settings');
   }, [router]);
+
+  useFocusEffect(
+    useCallback(() => {
+      void activateKeepAwakeAsync(KEEP_AWAKE_TAG);
+      return () => {
+        void deactivateKeepAwake(KEEP_AWAKE_TAG);
+      };
+    }, []),
+  );
 
   return (
     <View

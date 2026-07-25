@@ -888,14 +888,14 @@ src/utils/iap.utils.ts
 
 ### Optimization Checklist
 
-- [ ] Hermes enabled in `app.json` (`jsEngine: 'hermes'`)
-- [ ] All `console.log` replaced with a `__DEV__`-gated logger utility or removed entirely
-- [ ] All image assets run through `pngquant` / `oxipng` for compression
-- [ ] No unused packages remaining in `package.json`
-- [ ] `InteractionManager.runAfterInteractions` wrapping all post-animation store writes
-- [ ] `useMemo` on all board-derived computations (`emptyCells`, `tilePositions`)
-- [ ] `useCallback` on all event handlers passed as props down the tree
-- [ ] `useEffect` cleanup verified for every subscription, interval, and event listener
+- [x] Hermes enabled in `app.json` (`jsEngine: 'hermes'`)
+- [x] All `console.log` replaced with a `__DEV__`-gated logger utility or removed entirely
+- [x] All image assets run through `pngquant` / `oxipng` for compression
+- [x] No unused packages remaining in `package.json`
+- [x] `InteractionManager.runAfterInteractions` wrapping all post-animation store writes
+- [x] `useMemo` on all board-derived computations (`emptyCells`, `tilePositions`)
+- [x] `useCallback` on all event handlers passed as props down the tree
+- [x] `useEffect` cleanup verified for every subscription, interval, and event listener
 
 ### Key Files
 
