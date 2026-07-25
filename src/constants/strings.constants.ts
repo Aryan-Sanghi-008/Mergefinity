@@ -10,6 +10,7 @@ export const STRINGS = {
   GAME_TITLE: 'Mergefinity',
   SCORE_LABEL: 'SCORE',
   BEST_LABEL: 'BEST',
+  SCORE_DELTA_PREFIX: '+',
   NEW_GAME: 'New Game',
   UNDO: 'Undo',
   SWIPE_HINT: 'Swipe to move tiles',

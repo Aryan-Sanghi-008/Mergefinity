@@ -1,36 +1,65 @@
 /**
  * @file AnimatedTile.tsx
  * @layer components/organisms
- * @description Absolutely positioned tile shell; motion shared values arrive in P-07.
+ * @description Absolutely positioned tile with Reanimated slide/merge/spawn.
  */
 
 import { memo, useMemo } from 'react';
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { TileView } from '@/components/atoms';
-import type { CellValue } from '@/types';
+import { useAnimatedTile } from '@/hooks/useAnimatedTile';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import type { CellValue, TileMotionPhase } from '@/types';
 
 export interface AnimatedTileProps {
-  /** Stable identity for React keys / future Reanimated shared values. */
+  /** Stable identity for React keys / shared values. */
   tileId: string;
   /** Tile face value (non-zero). */
   value: CellValue;
-  /** Absolute left within the board. */
+  /** Absolute left of destination cell. */
   left: number;
-  /** Absolute top within the board. */
+  /** Absolute top of destination cell. */
   top: number;
+  /** Absolute left of source cell (slide start). */
+  fromLeft: number;
+  /** Absolute top of source cell (slide start). */
+  fromTop: number;
   /** Tile edge length. */
   size: number;
-  /** Optional Reanimated style (translate/scale/opacity). */
-  animatedStyle?: StyleProp<ViewStyle>;
+  /** Current motion phase. */
+  phase: TileMotionPhase;
+  /** Sequence bump to retrigger animations. */
+  motionSeq: number;
 }
 
 /**
- * Thin static wrapper over `TileView` with absolute board placement.
- * P-07 wires `useAnimatedTile` into `animatedStyle` without changing this API.
+ * Board tile shell — layout at destination; translates from source via shared values.
  */
 const AnimatedTile = memo(
-  ({ tileId, value, left, top, size, animatedStyle }: AnimatedTileProps) => {
+  ({
+    tileId,
+    value,
+    left,
+    top,
+    fromLeft,
+    fromTop,
+    size,
+    phase,
+    motionSeq,
+  }: AnimatedTileProps) => {
+    const reducedMotion = useReducedMotion();
+    const { animatedStyle } = useAnimatedTile({
+      left,
+      top,
+      fromLeft,
+      fromTop,
+      phase,
+      motionSeq,
+      reducedMotion,
+    });
+
     const styles = useMemo(
       () =>
         StyleSheet.create({
@@ -38,15 +67,22 @@ const AnimatedTile = memo(
             position: 'absolute',
             left,
             top,
+            width: size,
+            height: size,
           },
         }),
-      [left, top],
+      [left, top, size],
     );
 
     return (
-      <View style={styles.position} testID={tileId} importantForAccessibility="no">
-        <TileView value={value} size={size} animatedStyle={animatedStyle} />
-      </View>
+      <Animated.View
+        // TODO(reanimated-types): DefaultStyle vs ViewStyle under exactOptionalPropertyTypes
+        style={[styles.position, animatedStyle as object]}
+        testID={tileId}
+        importantForAccessibility="no"
+      >
+        <TileView value={value} size={size} />
+      </Animated.View>
     );
   },
 );

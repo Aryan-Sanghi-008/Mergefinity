@@ -1,14 +1,16 @@
 /**
  * @file WinOverlay.tsx
  * @layer components/molecules
- * @description Win modal — Keep Going / New Game.
+ * @description Win modal with Reanimated enter + card scale overshoot.
  */
 
 import { memo, useMemo } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { PrimaryButton } from '@/components/atoms';
 import { STRINGS } from '@/constants';
+import { useOverlayAnimation } from '@/hooks/useOverlayAnimation';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, TYPOGRAPHY } from '@/styles';
 
@@ -27,11 +29,18 @@ export interface WinOverlayProps {
 const WinOverlay = memo(({ visible, onContinue, onNewGame }: WinOverlayProps) => {
   const { theme } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const { scrimStyle, cardStyle } = useOverlayAnimation({
+    visible,
+    withScaleOvershoot: true,
+  });
 
   return (
-    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
-      <View style={styles.scrim}>
-        <View style={styles.card} accessibilityViewIsModal>
+    <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
+      <Animated.View style={[styles.scrim, scrimStyle as object]}>
+        <Animated.View
+          style={[styles.card, cardStyle as object]}
+          accessibilityViewIsModal
+        >
           <Text style={styles.title} allowFontScaling={false}>
             {STRINGS.WIN_TITLE}
           </Text>
@@ -42,8 +51,8 @@ const WinOverlay = memo(({ visible, onContinue, onNewGame }: WinOverlayProps) =>
             <PrimaryButton label={STRINGS.CONTINUE} onPress={onContinue} />
             <PrimaryButton label={STRINGS.NEW_GAME} onPress={onNewGame} />
           </View>
-        </View>
-      </View>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 });

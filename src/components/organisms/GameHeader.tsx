@@ -1,40 +1,63 @@
 /**
  * @file GameHeader.tsx
  * @layer components/organisms
- * @description Game title (left) + ScorePanel (right).
+ * @description Game title (left) + ScorePanel / score delta (right).
  */
 
 import { memo, useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 
+import { ScoreDeltaFloat } from '@/components/atoms';
 import { ScorePanel } from '@/components/molecules';
 import { STRINGS } from '@/constants';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, TYPOGRAPHY, type ThemeTokens } from '@/styles';
 
 export interface GameHeaderProps {
-  /** Current score. */
-  score: number;
-  /** Best score. */
-  bestScore: number;
+  /** Current score (rolling shared value preferred). */
+  score: number | SharedValue<number>;
+  /** Best score (rolling shared value preferred). */
+  bestScore: number | SharedValue<number>;
+  /** Floating +N amount. */
+  scoreDeltaAmount: number;
+  /** Whether +N float is visible. */
+  scoreDeltaVisible: boolean;
+  /** +N float animated style. */
+  scoreDeltaStyle: StyleProp<ViewStyle>;
 }
 
 /**
- * Minimal chrome above the board — title + scores.
+ * Minimal chrome above the board — title + scores + delta float.
  */
-const GameHeader = memo(({ score, bestScore }: GameHeaderProps) => {
-  const { theme } = useTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
+const GameHeader = memo(
+  ({
+    score,
+    bestScore,
+    scoreDeltaAmount,
+    scoreDeltaVisible,
+    scoreDeltaStyle,
+  }: GameHeaderProps) => {
+    const { theme } = useTheme();
+    const styles = useMemo(() => createStyles(theme), [theme]);
 
-  return (
-    <View style={styles.row}>
-      <Text style={styles.title} allowFontScaling={false}>
-        {STRINGS.GAME_TITLE}
-      </Text>
-      <ScorePanel score={score} bestScore={bestScore} />
-    </View>
-  );
-});
+    return (
+      <View style={styles.row}>
+        <Text style={styles.title} allowFontScaling={false}>
+          {STRINGS.GAME_TITLE}
+        </Text>
+        <View style={styles.scoreWrap}>
+          <ScorePanel score={score} bestScore={bestScore} />
+          <ScoreDeltaFloat
+            amount={scoreDeltaAmount}
+            visible={scoreDeltaVisible}
+            animatedStyle={scoreDeltaStyle}
+          />
+        </View>
+      </View>
+    );
+  },
+);
 
 GameHeader.displayName = 'GameHeader';
 
@@ -53,6 +76,10 @@ function createStyles(theme: ThemeTokens) {
       color: theme.TEXT_PRIMARY,
       flexShrink: 1,
       marginRight: SPACING_TOKENS.sm,
+    },
+    scoreWrap: {
+      position: 'relative',
+      overflow: 'visible',
     },
   });
 }

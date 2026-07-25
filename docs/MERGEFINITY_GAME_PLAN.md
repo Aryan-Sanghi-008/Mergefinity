@@ -441,9 +441,9 @@ src/hooks/useAnimationLock.ts
 
 ### Definition of Done
 
-- [ ] JS thread Systrace shows zero JS work during a swipe gesture execution
-- [ ] Rapid successive swipes (4 per second) never produce visual glitches or out-of-order tile positions
-- [ ] Merge pop animation plays on the correct tile even when multiple merges happen in the same move
+- [x] JS thread Systrace shows zero JS work during a swipe gesture execution
+- [x] Rapid successive swipes (4 per second) never produce visual glitches or out-of-order tile positions
+- [x] Merge pop animation plays on the correct tile even when multiple merges happen in the same move
 
 ---
 

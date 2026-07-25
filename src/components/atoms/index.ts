@@ -25,6 +25,9 @@ export type { ScoreLabelKind, ScoreLabelProps } from './ScoreLabel';
 export { ScoreValue } from './ScoreValue';
 export type { ScoreValueProps } from './ScoreValue';
 
+export { ScoreDeltaFloat } from './ScoreDeltaFloat';
+export type { ScoreDeltaFloatProps } from './ScoreDeltaFloat';
+
 export { StatusBadge } from './StatusBadge';
 export type { StatusBadgeProps, StatusBadgeVariant } from './StatusBadge';
 

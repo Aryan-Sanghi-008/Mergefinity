@@ -1,14 +1,16 @@
 /**
  * @file GameOverOverlay.tsx
  * @layer components/molecules
- * @description Full-screen dimmed game-over modal.
+ * @description Full-screen dimmed game-over modal with Reanimated enter.
  */
 
 import { memo, useMemo } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { PrimaryButton } from '@/components/atoms';
 import { STRINGS } from '@/constants';
+import { useOverlayAnimation } from '@/hooks/useOverlayAnimation';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, TYPOGRAPHY } from '@/styles';
 
@@ -30,11 +32,15 @@ const GameOverOverlay = memo(
   ({ visible, finalScore, onTryAgain, onNewGame }: GameOverOverlayProps) => {
     const { theme } = useTheme();
     const styles = useMemo(() => createStyles(theme), [theme]);
+    const { scrimStyle, cardStyle } = useOverlayAnimation({ visible });
 
     return (
-      <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
-        <View style={styles.scrim}>
-          <View style={styles.card} accessibilityViewIsModal>
+      <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
+        <Animated.View style={[styles.scrim, scrimStyle as object]}>
+          <Animated.View
+            style={[styles.card, cardStyle as object]}
+            accessibilityViewIsModal
+          >
             <Text style={styles.title} allowFontScaling={false}>
               {STRINGS.GAME_OVER_TITLE}
             </Text>
@@ -48,8 +54,8 @@ const GameOverOverlay = memo(
               <PrimaryButton label={STRINGS.TRY_AGAIN} onPress={onTryAgain} />
               <PrimaryButton label={STRINGS.NEW_GAME} onPress={onNewGame} />
             </View>
-          </View>
-        </View>
+          </Animated.View>
+        </Animated.View>
       </Modal>
     );
   },

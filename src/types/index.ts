@@ -34,4 +34,11 @@ export type {
 
 export type { GameStats, LifetimeStats, SessionRecord } from './stats.types';
 
-export type { IconName, OverlayKind, SettingsSection, TabName } from './ui.types';
+export type {
+  BoardTileEntity,
+  IconName,
+  OverlayKind,
+  SettingsSection,
+  TabName,
+  TileMotionPhase,
+} from './ui.types';

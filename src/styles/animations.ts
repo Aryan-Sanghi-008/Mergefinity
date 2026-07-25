@@ -5,15 +5,21 @@
  */
 
 import {
+  EDGE_PULSE_BORDER_WIDTH,
+  EDGE_PULSE_IN_MS,
+  EDGE_PULSE_OUT_MS,
   MERGE_DURATION_MS,
+  MERGE_POP_UP_DURATION_MS,
   MERGE_SCALE,
   OVERLAY_DURATION_MS,
   SCORE_DELTA_DURATION_MS,
   SCORE_DELTA_TRAVEL_DP,
+  SCORE_ROLL_DURATION_MS,
   SLIDE_DURATION_MS,
   SPAWN_DELAY_MS,
   SPAWN_DURATION_MS,
   SPAWN_INITIAL_SCALE,
+  WIN_CARD_OVERSHOOT_SCALE,
 } from '@/constants';
 
 /** Slide timing config (ease-out feel applied at call site). */
@@ -24,7 +30,7 @@ export const SLIDE_ANIMATION = {
 /** Merge pop scale sequence config. */
 export const MERGE_POP_ANIMATION = {
   peakScale: MERGE_SCALE,
-  upDurationMs: 60,
+  upDurationMs: MERGE_POP_UP_DURATION_MS,
   spring: {
     damping: 12,
     stiffness: 200,
@@ -49,8 +55,21 @@ export const SCORE_DELTA_ANIMATION = {
   travelDp: SCORE_DELTA_TRAVEL_DP,
 } as const;
 
+/** Score counter roll. */
+export const SCORE_ROLL_ANIMATION = {
+  durationMs: SCORE_ROLL_DURATION_MS,
+} as const;
+
 /** Win / game-over overlay. */
 export const OVERLAY_ANIMATION = {
   durationMs: OVERLAY_DURATION_MS,
   translateFromDp: 20,
+  winCardScale: WIN_CARD_OVERSHOOT_SCALE,
+} as const;
+
+/** Blocked-move board edge pulse. */
+export const EDGE_PULSE_ANIMATION = {
+  inMs: EDGE_PULSE_IN_MS,
+  outMs: EDGE_PULSE_OUT_MS,
+  borderWidth: EDGE_PULSE_BORDER_WIDTH,
 } as const;

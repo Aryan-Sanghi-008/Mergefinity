@@ -31,6 +31,27 @@ export const SCORE_DELTA_TRAVEL_DP = 40;
 /** Overlay fade/slide duration in ms. */
 export const OVERLAY_DURATION_MS = 300;
 
+/** Merge pop scale-up segment duration in ms (before spring settle). */
+export const MERGE_POP_UP_DURATION_MS = 60;
+
+/** Score counter roll duration in ms. */
+export const SCORE_ROLL_DURATION_MS = 300;
+
+/** Board edge pulse — flash in duration in ms. */
+export const EDGE_PULSE_IN_MS = 80;
+
+/** Board edge pulse — fade out duration in ms. */
+export const EDGE_PULSE_OUT_MS = 220;
+
+/** Board edge pulse border width in dp. */
+export const EDGE_PULSE_BORDER_WIDTH = 3;
+
+/** Win overlay card brief scale overshoot. */
+export const WIN_CARD_OVERSHOOT_SCALE = 1.04;
+
+/** Reduced-motion: collapse decorative durations to this floor (ms). */
+export const REDUCED_MOTION_DURATION_MS = 0;
+
 /** Achievement toast auto-dismiss duration in ms. */
 export const TOAST_DURATION_MS = 3000;
 
