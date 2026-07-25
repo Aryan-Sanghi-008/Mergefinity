@@ -32,10 +32,12 @@ export interface GameState {
   undosRemaining: number;
   /** Moves completed this game (for snapshots). */
   moveCount: number;
-  /** Player chose Keep Going after 2048. */
+  /** Player chose Keep Going after tile win. */
   continuedAfterWin: boolean;
   /** True while slide/merge/spawn runs (mirrored to SharedValue for gestures). */
   animationLock: boolean;
+  /** Remaining Time Attack ms; `null` when mode has no timer. */
+  timerRemainingMs: number | null;
 }
 
 /** Payload after animated slide→merge→spawn completes. */
@@ -60,6 +62,10 @@ export interface GameActions {
   setMode: (mode: GameMode) => void;
   /** Sync animation lock for gestures / status. */
   setAnimationLock: (locked: boolean) => void;
+  /** Tick / set Time Attack remaining ms. */
+  setTimerRemainingMs: (ms: number | null) => void;
+  /** End Time Attack when countdown hits zero (status won). */
+  expireTimer: () => void;
 }
 
 /** Combined Zustand game store shape. */
@@ -108,6 +114,10 @@ export interface StatsActions {
   setSessionHistory: (sessions: SessionRecord[]) => void;
   /** Reset lifetime + per-mode stats (keeps best scores elsewhere). */
   resetStats: () => void;
+  /** Raise per-mode best score when `score` is higher. */
+  recordBestScore: (mode: GameMode, score: number) => void;
+  /** Read best score for a mode. */
+  getBestScore: (mode: GameMode) => number;
 }
 
 /** Combined stats store. */

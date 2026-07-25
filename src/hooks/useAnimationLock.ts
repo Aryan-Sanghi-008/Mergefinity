@@ -24,14 +24,11 @@ export function useAnimationLock(): AnimationLock {
   const locked = useSharedValue(false);
 
   const lock = useCallback(() => {
-    // Reanimated SharedValue mutation (not React state).
-    // eslint-disable-next-line react-hooks/immutability -- intentional shared value write
-    locked.value = true;
+    locked.set(true);
   }, [locked]);
 
   const unlock = useCallback(() => {
-    // eslint-disable-next-line react-hooks/immutability -- intentional shared value write
-    locked.value = false;
+    locked.set(false);
   }, [locked]);
 
   return { locked, lock, unlock };

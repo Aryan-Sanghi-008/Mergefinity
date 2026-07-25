@@ -22,6 +22,17 @@ export { STRINGS } from './strings.constants';
 export type { StringKey } from './strings.constants';
 
 export {
+  GAME_MODES,
+  MODE_CONFIG,
+  MS_PER_SECOND,
+  SECONDS_PER_MINUTE,
+  TIMER_SECONDS_PAD,
+  UNDO_HISTORY_CAP,
+  UNDO_UNLIMITED,
+} from './modes.constants';
+export type { ModeConfig } from './modes.constants';
+
+export {
   EDGE_PULSE_BORDER_WIDTH,
   EDGE_PULSE_IN_MS,
   EDGE_PULSE_OUT_MS,

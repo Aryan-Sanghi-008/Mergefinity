@@ -43,20 +43,21 @@ export function useBoardShake(): UseBoardShakeResult {
   const pulse = useCallback(() => {
     const inMs = reducedMotion ? REDUCED_MOTION_DURATION_MS : EDGE_PULSE_IN_MS;
     const outMs = reducedMotion ? REDUCED_MOTION_DURATION_MS : EDGE_PULSE_OUT_MS;
-    // eslint-disable-next-line react-hooks/immutability -- intentional shared value write
-    progress.value = 0;
+    progress.set(0);
     if (inMs === 0 && outMs === 0) {
       return;
     }
-    progress.value = withSequence(
-      withTiming(1, { duration: inMs, easing: Easing.out(Easing.quad) }),
-      withTiming(0, { duration: outMs, easing: Easing.in(Easing.quad) }),
+    progress.set(
+      withSequence(
+        withTiming(1, { duration: inMs, easing: Easing.out(Easing.quad) }),
+        withTiming(0, { duration: outMs, easing: Easing.in(Easing.quad) }),
+      ),
     );
   }, [progress, reducedMotion]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     borderWidth: EDGE_PULSE_BORDER_WIDTH,
-    borderColor: interpolateColor(progress.value, [0, 1], [idleBorder, accent]),
+    borderColor: interpolateColor(progress.get(), [0, 1], [idleBorder, accent]),
   }));
 
   return { pulse, animatedStyle };

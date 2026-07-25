@@ -39,3 +39,6 @@ export type { TileViewProps } from './TileView';
 
 export { Toast } from './Toast';
 export type { ToastProps } from './Toast';
+
+export { TimerReadout } from './TimerReadout';
+export type { TimerReadoutProps } from './TimerReadout';

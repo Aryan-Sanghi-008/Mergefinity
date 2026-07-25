@@ -1,25 +1,37 @@
 /**
  * @file index.tsx
  * @layer app
- * @description Game screen — composes organisms via useGameEngine (P-09).
+ * @description Game screen — modes, board, timer, overlays (P-10).
  */
 
 import { memo, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { GameOverOverlay, WinOverlay } from '@/components/molecules';
+import { TimerReadout } from '@/components/atoms';
+import {
+  ConfirmDialog,
+  GameOverOverlay,
+  ModeSelector,
+  WinOverlay,
+} from '@/components/molecules';
 import { GameBoard, GameControls, GameHeader } from '@/components/organisms';
+import { STRINGS } from '@/constants';
 import { useGameEngine } from '@/hooks/useGameEngine';
+import { useGameMode } from '@/hooks/useGameMode';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, type ThemeTokens } from '@/styles';
 
 /**
- * Home / game screen — zero game logic; store via `useGameEngine`.
+ * Home / game screen — zero game logic; hooks own store + motion.
  */
 const GameScreen = memo(() => {
   const { theme } = useTheme();
   const game = useGameEngine();
+  const modeApi = useGameMode();
   const styles = useMemo(() => createStyles(theme), [theme]);
+
+  const winTitle = game.isTimeUpWin ? STRINGS.TIME_UP_TITLE : STRINGS.WIN_TITLE;
+  const winSub = game.isTimeUpWin ? STRINGS.TIME_UP_SUB : STRINGS.WIN_SUB;
 
   return (
     <View style={styles.container}>
@@ -30,23 +42,36 @@ const GameScreen = memo(() => {
         scoreDeltaVisible={game.scoreDelta.visible}
         scoreDeltaStyle={game.scoreDelta.animatedStyle as object}
       />
+      <ModeSelector
+        selected={modeApi.mode}
+        onSelect={modeApi.requestModeChange}
+      />
+      {game.hasTimer ? (
+        <View style={styles.timerRow}>
+          <TimerReadout remainingMs={game.timerRemaining} />
+        </View>
+      ) : null}
       <View style={styles.boardSlot}>
         <GameBoard
           tiles={game.tiles}
           onSwipe={game.onMove}
           animationLock={game.animationLock}
           edgePulseStyle={game.edgePulse.animatedStyle}
+          cellCount={game.cellCount}
         />
       </View>
       <GameControls
         onNewGame={game.onNewGame}
         onUndo={game.onUndo}
         undoDisabled={game.undoDisabled}
-        undoRemaining={game.undoRemaining}
+        {...(game.undoRemaining > 0 ? { undoRemaining: game.undoRemaining } : {})}
       />
       <WinOverlay
         visible={game.status === 'won'}
-        onContinue={game.onContinue}
+        title={winTitle}
+        subtitle={winSub}
+        showContinue={!game.isTimeUpWin}
+        {...(!game.isTimeUpWin ? { onContinue: game.onContinue } : {})}
         onNewGame={game.onNewGame}
       />
       <GameOverOverlay
@@ -54,6 +79,13 @@ const GameScreen = memo(() => {
         finalScore={game.score}
         onTryAgain={game.onNewGame}
         onNewGame={game.onNewGame}
+      />
+      <ConfirmDialog
+        visible={modeApi.pendingMode !== null}
+        title={STRINGS.MODE_SWITCH_CONFIRM}
+        message={STRINGS.MODE_SWITCH_CONFIRM_SUB}
+        onConfirm={modeApi.confirmModeChange}
+        onCancel={modeApi.cancelModeChange}
       />
     </View>
   );
@@ -68,6 +100,10 @@ function createStyles(theme: ThemeTokens) {
       flexDirection: 'column',
       backgroundColor: theme.SURFACE,
       paddingVertical: SPACING_TOKENS.sm,
+      gap: SPACING_TOKENS.sm,
+    },
+    timerRow: {
+      alignItems: 'center',
     },
     boardSlot: {
       flex: 1,

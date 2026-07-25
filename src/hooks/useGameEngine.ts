@@ -1,27 +1,31 @@
 /**
  * @file useGameEngine.ts
  * @layer hooks
- * @description Gesture → animate → gameStore commit bridge (P-09).
+ * @description Gesture → animate → gameStore commit bridge (P-09 / P-10).
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState, type AppStateStatus } from 'react-native';
 import type { SharedValue } from 'react-native-reanimated';
 
 import {
   MERGE_DURATION_MS,
+  MODE_CONFIG,
   REDUCED_MOTION_DURATION_MS,
   SLIDE_DURATION_MS,
   SPAWN_DELAY_MS,
   SPAWN_DURATION_MS,
+  UNDO_UNLIMITED,
 } from '@/constants';
 import { resolveMove, spawnTile } from '@/engine';
 import { useAnimationLock } from '@/hooks/useAnimationLock';
 import { useBoardShake } from '@/hooks/useBoardShake';
+import { useCountdown } from '@/hooks/useCountdown';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useScoreCounter } from '@/hooks/useScoreCounter';
 import { useScoreDelta } from '@/hooks/useScoreDelta';
 import { useGameStore } from '@/store/gameStore';
-import type { BoardTileEntity, Direction, GameStatus } from '@/types';
+import type { BoardTileEntity, Direction, GameMode, GameStatus } from '@/types';
 import { delay } from '@/utils/delay';
 import {
   hapticGameOver,
@@ -40,17 +44,21 @@ import {
 
 /** Game screen surface from the engine hook. */
 export interface GameEngineState {
+  /** Active mode. */
+  mode: GameMode;
+  /** Cells per axis for the board. */
+  cellCount: number;
   /** Visual tile entities. */
   tiles: BoardTileEntity[];
   /** Current score. */
   score: number;
   /** Rolling score shared value. */
   scoreValue: SharedValue<number>;
-  /** Best score. */
+  /** Best score for active mode. */
   bestScore: number;
   /** Rolling best shared value. */
   bestScoreValue: SharedValue<number>;
-  /** Undos remaining this game. */
+  /** Undos remaining (`-1` = unlimited). */
   undoRemaining: number;
   /** Undo control disabled. */
   undoDisabled: boolean;
@@ -62,32 +70,46 @@ export interface GameEngineState {
   edgePulse: ReturnType<typeof useBoardShake>;
   /** SharedValue lock for pan worklet. */
   animationLock: SharedValue<boolean>;
+  /** Time Attack remaining ms shared value (0 when no timer). */
+  timerRemaining: SharedValue<number>;
+  /** Whether the active mode uses a timer. */
+  hasTimer: boolean;
+  /** True when win came from timer expiry (no Keep Going). */
+  isTimeUpWin: boolean;
   /** Swipe handler. */
   onMove: (direction: Direction) => void;
   /** New game. */
   onNewGame: () => void;
   /** Undo. */
   onUndo: () => void;
-  /** Keep going after win. */
+  /** Keep going after tile win. */
   onContinue: () => void;
 }
 
 /**
- * Authoritative play loop: store state + Reanimated tile sequencing.
+ * Authoritative play loop: store state + Reanimated tile sequencing + timer.
  */
 export function useGameEngine(): GameEngineState {
+  const mode = useGameStore((s) => s.mode);
   const score = useGameStore((s) => s.score);
   const bestScore = useGameStore((s) => s.bestScore);
   const status = useGameStore((s) => s.status);
   const undosRemaining = useGameStore((s) => s.undosRemaining);
   const historyLength = useGameStore((s) => s.history.length);
   const storeLock = useGameStore((s) => s.animationLock);
+  const timerRemainingMs = useGameStore((s) => s.timerRemainingMs);
 
   const commitMove = useGameStore((s) => s.commitMove);
   const undo = useGameStore((s) => s.undo);
   const restart = useGameStore((s) => s.restart);
   const continueAfterWinAction = useGameStore((s) => s.continueAfterWin);
   const setAnimationLock = useGameStore((s) => s.setAnimationLock);
+  const setTimerRemainingMs = useGameStore((s) => s.setTimerRemainingMs);
+  const expireTimer = useGameStore((s) => s.expireTimer);
+
+  const config = MODE_CONFIG[mode];
+  const cellCount = config.boardSize;
+  const hasTimer = config.hasTimer;
 
   const [tileSeed] = useState(() => {
     const createId = createTileIdFactory();
@@ -99,6 +121,8 @@ export function useGameEngine(): GameEngineState {
   const createIdRef = useRef(tileSeed.createId);
   const motionSeqRef = useRef(0);
   const busyRef = useRef(false);
+  const [appActive, setAppActive] = useState(true);
+  const [isTimeUpWin, setIsTimeUpWin] = useState(false);
   const reducedMotion = useReducedMotion();
   const { locked, lock, unlock } = useAnimationLock();
   const scoreDelta = useScoreDelta();
@@ -108,18 +132,45 @@ export function useGameEngine(): GameEngineState {
   const scoreValue = useScoreCounter(score);
   const bestScoreValue = useScoreCounter(bestScore);
 
-  /** Mirror store lock ↔ SharedValue for gesture worklet. */
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue write
-    locked.value = storeLock;
+    locked.set(storeLock);
   }, [storeLock, locked]);
 
-  /** After persist rehydrate, rebuild tile entities from board. */
+  useEffect(() => {
+    const onChange = (next: AppStateStatus) => {
+      const active = next === 'active';
+      setAppActive(active);
+    };
+    const sub = AppState.addEventListener('change', onChange);
+    return () => sub.remove();
+  }, []);
+
+  const onExpire = useCallback(() => {
+    setIsTimeUpWin(true);
+    expireTimer();
+    hapticWin();
+  }, [expireTimer]);
+
+  const timerPaused =
+    !appActive ||
+    status === 'animating' ||
+    status === 'won' ||
+    status === 'lost' ||
+    !hasTimer;
+
+  const { remainingMs: timerRemaining } = useCountdown({
+    remainingMs: hasTimer ? timerRemainingMs : null,
+    paused: timerPaused,
+    onExpire,
+    onTick: setTimerRemainingMs,
+  });
+
   useEffect(() => {
     const syncTiles = () => {
       createIdRef.current = createTileIdFactory();
       motionSeqRef.current = 0;
       setTiles(entitiesFromBoard(useGameStore.getState().board, createIdRef.current));
+      setIsTimeUpWin(false);
     };
 
     if (useGameStore.persist.hasHydrated()) {
@@ -127,6 +178,14 @@ export function useGameEngine(): GameEngineState {
     }
     return useGameStore.persist.onFinishHydration(syncTiles);
   }, []);
+
+  /** Rebuild tiles when mode / board size changes. */
+  useEffect(() => {
+    createIdRef.current = createTileIdFactory();
+    motionSeqRef.current = 0;
+    setTiles(entitiesFromBoard(useGameStore.getState().board, createIdRef.current));
+    setIsTimeUpWin(false);
+  }, [mode, cellCount]);
 
   const phaseMs = useCallback(
     (ms: number) => (reducedMotion ? REDUCED_MOTION_DURATION_MS : ms),
@@ -137,6 +196,7 @@ export function useGameEngine(): GameEngineState {
     createIdRef.current = createTileIdFactory();
     motionSeqRef.current = 0;
     setTiles(entitiesFromBoard(useGameStore.getState().board, createIdRef.current));
+    setIsTimeUpWin(false);
   }, []);
 
   const onNewGame = useCallback(() => {
@@ -147,7 +207,7 @@ export function useGameEngine(): GameEngineState {
   }, [unlock, restart, resetTilesFromBoard]);
 
   const onUndo = useCallback(() => {
-    if (busyRef.current || locked.value) {
+    if (busyRef.current || locked.get()) {
       return;
     }
     undo();
@@ -156,11 +216,12 @@ export function useGameEngine(): GameEngineState {
 
   const onContinue = useCallback(() => {
     continueAfterWinAction();
+    setIsTimeUpWin(false);
   }, [continueAfterWinAction]);
 
   const onMove = useCallback(
     (direction: Direction) => {
-      if (busyRef.current || locked.value || storeLock) {
+      if (busyRef.current || locked.get() || storeLock) {
         return;
       }
       const currentStatus = useGameStore.getState().status;
@@ -169,7 +230,8 @@ export function useGameEngine(): GameEngineState {
       }
 
       const currentBoard = useGameStore.getState().board;
-      const result = resolveMove(currentBoard, direction);
+      const boardSize = MODE_CONFIG[useGameStore.getState().mode].boardSize;
+      const result = resolveMove(currentBoard, direction, boardSize);
       if (!result.boardChanged) {
         edgePulse.pulse();
         return;
@@ -250,9 +312,15 @@ export function useGameEngine(): GameEngineState {
     ],
   );
 
-  const undoDisabled = undosRemaining <= 0 || historyLength === 0 || status === 'animating';
+  const unlimited = undosRemaining === UNDO_UNLIMITED;
+  const undoDisabled =
+    historyLength === 0 ||
+    status === 'animating' ||
+    (!unlimited && undosRemaining <= 0);
 
   return {
+    mode,
+    cellCount,
     tiles,
     score,
     scoreValue,
@@ -264,6 +332,9 @@ export function useGameEngine(): GameEngineState {
     scoreDelta,
     edgePulse,
     animationLock: locked,
+    timerRemaining,
+    hasTimer,
+    isTimeUpWin,
     onMove,
     onNewGame,
     onUndo,

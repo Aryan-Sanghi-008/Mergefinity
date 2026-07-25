@@ -4,7 +4,7 @@
  * @description Left-shift + merge for a single board row.
  */
 
-import { BOARD_SIZE, TILE_MERGE_FACTOR } from '@/constants';
+import { TILE_MERGE_FACTOR } from '@/constants';
 import type { CellValue, RowTileMove, ShiftRowResult } from '@/types';
 
 /**
@@ -63,7 +63,7 @@ export function shiftRowLeft(row: readonly CellValue[]): ShiftRowResult {
     }
   }
 
-  while (merged.length < BOARD_SIZE) {
+  while (merged.length < row.length) {
     merged.push(0);
   }
 

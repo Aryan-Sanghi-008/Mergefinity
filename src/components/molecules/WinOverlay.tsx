@@ -1,7 +1,7 @@
 /**
  * @file WinOverlay.tsx
  * @layer components/molecules
- * @description Win modal with Reanimated enter + card scale overshoot.
+ * @description Win / time-up modal with Reanimated enter + card scale overshoot.
  */
 
 import { memo, useMemo } from 'react';
@@ -17,45 +17,63 @@ import { SPACING_TOKENS, TYPOGRAPHY } from '@/styles';
 export interface WinOverlayProps {
   /** Whether the overlay is visible. */
   visible: boolean;
-  /** Continue past 2048. */
-  onContinue: () => void;
+  /** Continue past tile win (hidden for Time Attack expiry). */
+  onContinue?: () => void;
   /** Start a new game. */
   onNewGame: () => void;
+  /** Optional title override. */
+  title?: string;
+  /** Optional subtitle override. */
+  subtitle?: string;
+  /** Show Keep Going (default true when onContinue provided). */
+  showContinue?: boolean;
 }
 
 /**
- * First-win celebration overlay (no emoji / confetti).
+ * First-win / time-up celebration overlay (no emoji / confetti).
  */
-const WinOverlay = memo(({ visible, onContinue, onNewGame }: WinOverlayProps) => {
-  const { theme } = useTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
-  const { scrimStyle, cardStyle } = useOverlayAnimation({
+const WinOverlay = memo(
+  ({
     visible,
-    withScaleOvershoot: true,
-  });
+    onContinue,
+    onNewGame,
+    title = STRINGS.WIN_TITLE,
+    subtitle = STRINGS.WIN_SUB,
+    showContinue = true,
+  }: WinOverlayProps) => {
+    const { theme } = useTheme();
+    const styles = useMemo(() => createStyles(theme), [theme]);
+    const { scrimStyle, cardStyle } = useOverlayAnimation({
+      visible,
+      withScaleOvershoot: true,
+    });
+    const canContinue = showContinue && onContinue !== undefined;
 
-  return (
-    <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
-      <Animated.View style={[styles.scrim, scrimStyle as object]}>
-        <Animated.View
-          style={[styles.card, cardStyle as object]}
-          accessibilityViewIsModal
-        >
-          <Text style={styles.title} allowFontScaling={false}>
-            {STRINGS.WIN_TITLE}
-          </Text>
-          <Text style={styles.sub} allowFontScaling={false}>
-            {STRINGS.WIN_SUB}
-          </Text>
-          <View style={styles.actions}>
-            <PrimaryButton label={STRINGS.CONTINUE} onPress={onContinue} />
-            <PrimaryButton label={STRINGS.NEW_GAME} onPress={onNewGame} />
-          </View>
+    return (
+      <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
+        <Animated.View style={[styles.scrim, scrimStyle as object]}>
+          <Animated.View
+            style={[styles.card, cardStyle as object]}
+            accessibilityViewIsModal
+          >
+            <Text style={styles.title} allowFontScaling={false}>
+              {title}
+            </Text>
+            <Text style={styles.sub} allowFontScaling={false}>
+              {subtitle}
+            </Text>
+            <View style={styles.actions}>
+              {canContinue ? (
+                <PrimaryButton label={STRINGS.CONTINUE} onPress={onContinue} />
+              ) : null}
+              <PrimaryButton label={STRINGS.NEW_GAME} onPress={onNewGame} />
+            </View>
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
-    </Modal>
-  );
-});
+      </Modal>
+    );
+  },
+);
 
 WinOverlay.displayName = 'WinOverlay';
 

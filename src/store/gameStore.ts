@@ -1,19 +1,26 @@
 /**
  * @file gameStore.ts
  * @layer store
- * @description Authoritative game session store with selective persistence (P-09).
+ * @description Authoritative game session store — mode-aware (P-09 / P-10).
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 
-import { MAX_UNDO_HISTORY, STORAGE_KEYS } from '@/constants';
+import {
+  MODE_CONFIG,
+  MS_PER_SECOND,
+  STORAGE_KEYS,
+  UNDO_HISTORY_CAP,
+  UNDO_UNLIMITED,
+} from '@/constants';
 import { isLost, isWon } from '@/engine';
-import type { GameSnapshot, GameStore } from '@/types';
+import type { GameMode, GameSnapshot, GameStore } from '@/types';
 import { createFreshBoard } from '@/utils/createFreshBoard';
 
 import { analytics } from './middleware/analytics.middleware';
+import { useStatsStore } from './statsStore';
 
 /** Fields restored after app kill (DoD — exact board resume). */
 export type GamePersistedSlice = Pick<
@@ -27,9 +34,23 @@ export type GamePersistedSlice = Pick<
   | 'undosRemaining'
   | 'moveCount'
   | 'continuedAfterWin'
+  | 'timerRemainingMs'
 >;
 
-function createInitialState(): Omit<
+function undosForMode(mode: GameMode): number {
+  const limit = MODE_CONFIG[mode].undoLimit;
+  return limit === null ? UNDO_UNLIMITED : limit;
+}
+
+function timerForMode(mode: GameMode): number | null {
+  const config = MODE_CONFIG[mode];
+  if (!config.hasTimer) {
+    return null;
+  }
+  return config.timerSeconds * MS_PER_SECOND;
+}
+
+function createInitialState(mode: GameMode = 'classic'): Omit<
   GameStore,
   | 'commitMove'
   | 'undo'
@@ -37,33 +58,38 @@ function createInitialState(): Omit<
   | 'continueAfterWin'
   | 'setMode'
   | 'setAnimationLock'
+  | 'setTimerRemainingMs'
+  | 'expireTimer'
 > {
+  const config = MODE_CONFIG[mode];
+  const bestScore = useStatsStore.getState().byMode[mode]?.bestScore ?? 0;
   return {
-    board: createFreshBoard(),
+    board: createFreshBoard(config.boardSize),
     score: 0,
-    bestScore: 0,
+    bestScore,
     status: 'playing',
     history: [],
-    mode: 'classic',
-    undosRemaining: MAX_UNDO_HISTORY,
+    mode,
+    undosRemaining: undosForMode(mode),
     moveCount: 0,
     continuedAfterWin: false,
     animationLock: false,
+    timerRemainingMs: timerForMode(mode),
   };
 }
 
 /**
- * Game store — session + bestScore/mode persisted for kill/resume DoD.
- * Components must not import this; use `useGameEngine` / selectors.
+ * Game store — session + mode persisted; best scores live in statsStore.
  */
 export const useGameStore = create<GameStore>()(
   devtools(
     persist(
       analytics((set, get) => ({
-        ...createInitialState(),
+        ...createInitialState('classic'),
 
         commitMove: ({ board, scoreDelta }) => {
           const state = get();
+          const config = MODE_CONFIG[state.mode];
 
           const snapshot: GameSnapshot = {
             board: state.board,
@@ -71,15 +97,20 @@ export const useGameStore = create<GameStore>()(
             moves: state.moveCount,
             timestamp: Date.now(),
           };
-          const history = [...state.history, snapshot].slice(-MAX_UNDO_HISTORY);
+          const history = [...state.history, snapshot].slice(-UNDO_HISTORY_CAP);
           const score = state.score + scoreDelta;
-          const bestScore = Math.max(state.bestScore, score);
           const moveCount = state.moveCount + 1;
 
+          useStatsStore.getState().recordBestScore(state.mode, score);
+          const bestScore = useStatsStore.getState().getBestScore(state.mode);
+
           let status: GameStore['status'] = 'playing';
-          if (!state.continuedAfterWin && isWon(board)) {
+          if (
+            !state.continuedAfterWin &&
+            isWon(board, config.winValue)
+          ) {
             status = 'won';
-          } else if (isLost(board)) {
+          } else if (isLost(board, config.boardSize)) {
             status = 'lost';
           }
 
@@ -96,9 +127,10 @@ export const useGameStore = create<GameStore>()(
 
         undo: () => {
           const state = get();
+          const unlimited = state.undosRemaining === UNDO_UNLIMITED;
           if (
             state.animationLock ||
-            state.undosRemaining <= 0 ||
+            (!unlimited && state.undosRemaining <= 0) ||
             state.history.length === 0
           ) {
             return;
@@ -113,19 +145,18 @@ export const useGameStore = create<GameStore>()(
             score: snapshot.score,
             moveCount: snapshot.moves,
             history,
-            undosRemaining: state.undosRemaining - 1,
+            undosRemaining: unlimited
+              ? UNDO_UNLIMITED
+              : state.undosRemaining - 1,
             status: 'playing',
             animationLock: false,
           });
         },
 
         restart: () => {
-          const { bestScore, mode } = get();
+          const { mode } = get();
           set({
-            ...createInitialState(),
-            board: createFreshBoard(),
-            bestScore,
-            mode,
+            ...createInitialState(mode),
           });
         },
 
@@ -134,12 +165,8 @@ export const useGameStore = create<GameStore>()(
         },
 
         setMode: (mode) => {
-          const { bestScore } = get();
           set({
-            ...createInitialState(),
-            board: createFreshBoard(),
-            bestScore,
-            mode,
+            ...createInitialState(mode),
           });
         },
 
@@ -155,6 +182,27 @@ export const useGameStore = create<GameStore>()(
           }
           set({ animationLock: false });
         },
+
+        setTimerRemainingMs: (ms) => {
+          set({ timerRemainingMs: ms });
+        },
+
+        expireTimer: () => {
+          const state = get();
+          if (!MODE_CONFIG[state.mode].hasTimer) {
+            return;
+          }
+          if (state.status === 'won' || state.status === 'lost') {
+            return;
+          }
+          useStatsStore.getState().recordBestScore(state.mode, state.score);
+          set({
+            status: 'won',
+            timerRemainingMs: 0,
+            animationLock: false,
+            bestScore: useStatsStore.getState().getBestScore(state.mode),
+          });
+        },
       })),
       {
         name: STORAGE_KEYS.GAME_STATE,
@@ -169,6 +217,7 @@ export const useGameStore = create<GameStore>()(
           undosRemaining: state.undosRemaining,
           moveCount: state.moveCount,
           continuedAfterWin: state.continuedAfterWin,
+          timerRemainingMs: state.timerRemainingMs,
         }),
         merge: (persisted, current) => {
           const slice = persisted as Partial<GamePersistedSlice> | undefined;

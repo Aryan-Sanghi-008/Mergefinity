@@ -39,6 +39,10 @@ export const STRINGS = {
   MODE_CHALLENGE: 'Challenge',
   MODE_TIME_ATTACK: 'Time Attack',
   MODE_SWITCH_CONFIRM: 'Switch mode and restart?',
+  MODE_SWITCH_CONFIRM_SUB: 'Your current board and score will be lost.',
+  TIME_UP_TITLE: "Time's Up",
+  TIME_UP_SUB: 'Your final score is locked in.',
+  TIMER_LABEL: 'Time',
 
   // Settings
   SETTINGS_TITLE: 'Settings',

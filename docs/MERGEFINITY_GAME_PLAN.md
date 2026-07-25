@@ -577,9 +577,9 @@ src/components/molecules/ModeSelector.tsx
 
 ### Definition of Done
 
-- [ ] All 4 modes playable end-to-end including win/loss transitions
-- [ ] Switching from Classic to Challenge visually resizes the board without any layout flicker
-- [ ] Time Attack timer pauses correctly on background and resumes accurately on foreground
+- [x] All 4 modes playable end-to-end including win/loss transitions
+- [x] Switching from Classic to Challenge visually resizes the board without any layout flicker
+- [x] Time Attack timer pauses correctly on background and resumes accurately on foreground
 
 ---
 

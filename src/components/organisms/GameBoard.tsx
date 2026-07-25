@@ -29,15 +29,22 @@ export interface GameBoardProps {
   animationLock: SharedValue<boolean>;
   /** Edge-pulse animated style from useBoardShake. */
   edgePulseStyle: object;
+  /** Cells per axis (4 Classic, 5 Challenge). */
+  cellCount: number;
 }
 
 /**
  * Perfect-square game board with pan gesture and absolute tiles.
  */
 const GameBoard = memo(
-  ({ tiles, onSwipe, animationLock, edgePulseStyle }: GameBoardProps) => {
+  ({ tiles, onSwipe, animationLock, edgePulseStyle, cellCount }: GameBoardProps) => {
     const { theme } = useTheme();
-    const { boardSizePx, tileSize, cellOffsets, cellCount } = useBoardDimensions();
+    const {
+      boardSizePx,
+      tileSize,
+      cellOffsets,
+      cellCount: axis,
+    } = useBoardDimensions(cellCount);
     const gesture = useSwipeGesture({ onSwipe, animationLock });
     const styles = useMemo(
       () => createStyles(theme, boardSizePx),
@@ -59,8 +66,8 @@ const GameBoard = memo(
     );
 
     const cellIndices = useMemo(
-      () => Array.from({ length: cellCount * cellCount }, (_, index) => index),
-      [cellCount],
+      () => Array.from({ length: axis * axis }, (_, index) => index),
+      [axis],
     );
 
     return (
@@ -82,7 +89,7 @@ const GameBoard = memo(
               </View>
             );
           })}
-          <BoardTileLayer tiles={tiles} />
+          <BoardTileLayer tiles={tiles} cellCount={cellCount} />
         </Animated.View>
       </GestureDetector>
     );

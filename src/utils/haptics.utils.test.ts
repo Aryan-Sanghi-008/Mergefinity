@@ -4,14 +4,15 @@
  * @description Gating tests for haptics helpers.
  */
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  // eslint-disable-next-line @typescript-eslint/no-require-imports -- Jest mock factory
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
-
 import { useSettingsStore } from '@/store/settingsStore';
 
 import { isHapticsEnabled } from './haptics.utils';
+
+jest.mock('@react-native-async-storage/async-storage', () =>
+  jest.requireActual(
+    '@react-native-async-storage/async-storage/jest/async-storage-mock',
+  ),
+);
 
 describe('isHapticsEnabled', () => {
   afterEach(() => {

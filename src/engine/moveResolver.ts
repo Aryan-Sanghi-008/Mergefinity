@@ -14,23 +14,27 @@ import { shiftRowLeft } from './rowShifter';
  * Resolves a swipe in the given direction.
  * @param board - Current board (read-only)
  * @param dir - Player's swipe direction
- * @returns MoveResult with board, score delta, tileMoves, and boardChanged
+ * @param boardSize - Cells per axis (default Classic 4)
  */
-export function resolveMove(board: Readonly<Board>, dir: Direction): MoveResult {
+export function resolveMove(
+  board: Readonly<Board>,
+  dir: Direction,
+  boardSize: number = BOARD_SIZE,
+): MoveResult {
   const rotations = DIR_ROTATIONS[dir];
   const pre = rotations[0];
   const post = rotations[1];
   const inversePre = normalizeInverse(pre);
 
-  const rotated = rotateBoard(board, pre);
+  const rotated = rotateBoard(board, pre, boardSize);
 
   let delta = 0;
   const shifted: CellValue[] = [];
   const tileMoves: TileMove[] = [];
 
-  for (let row = 0; row < BOARD_SIZE; row += 1) {
-    const rowStart = row * BOARD_SIZE;
-    const rowValues = rotated.slice(rowStart, rowStart + BOARD_SIZE) as CellValue[];
+  for (let row = 0; row < boardSize; row += 1) {
+    const rowStart = row * boardSize;
+    const rowValues = rotated.slice(rowStart, rowStart + boardSize) as CellValue[];
     const { row: nextRow, delta: rowDelta, moves } = shiftRowLeft(rowValues);
     delta += rowDelta;
     shifted.push(...nextRow);
@@ -44,15 +48,15 @@ export function resolveMove(board: Readonly<Board>, dir: Direction): MoveResult 
       const toRotated = rowStart + move.toCol;
 
       tileMoves.push({
-        from: rotateIndex(fromRotated, inversePre),
-        to: rotateIndex(toRotated, post),
+        from: rotateIndex(fromRotated, inversePre, boardSize),
+        to: rotateIndex(toRotated, post, boardSize),
         value: move.value,
         merged: move.merged,
       });
     }
   }
 
-  const result = rotateBoard(shifted as Board, post);
+  const result = rotateBoard(shifted as Board, post, boardSize);
   const boardChanged = result.some((value, index) => value !== board[index]);
 
   return {

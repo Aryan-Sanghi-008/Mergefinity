@@ -7,6 +7,9 @@
 export { AchievementCard } from './AchievementCard';
 export type { AchievementCardProps } from './AchievementCard';
 
+export { ConfirmDialog } from './ConfirmDialog';
+export type { ConfirmDialogProps } from './ConfirmDialog';
+
 export { ControlBar } from './ControlBar';
 export type { ControlBarProps } from './ControlBar';
 

@@ -22,10 +22,18 @@ describe('isWon', () => {
     expect(isWon(board)).toBe(true);
   });
 
-  it('returns true when a cell exceeds WIN_VALUE', () => {
+  it('returns false when winValue is null (Endless / Time Attack)', () => {
     const board = createEmptyBoard();
+    board[0] = 2048;
+    expect(isWon(board, null)).toBe(false);
+  });
+
+  it('uses a custom winValue for Challenge', () => {
+    const board = createEmptyBoard();
+    board[0] = 2048;
+    expect(isWon(board, 4096)).toBe(false);
     board[0] = 4096;
-    expect(isWon(board)).toBe(true);
+    expect(isWon(board, 4096)).toBe(true);
   });
 });
 

@@ -2,11 +2,10 @@
  * @file boardUtils.ts
  * @layer engine
  * @description Pure board helpers — empty board, empty cells, spawn, clone.
- *              No React, no side effects, no async.
  */
 
 import {
-  CELL_COUNT,
+  BOARD_SIZE,
   SPAWN_TILE_2,
   SPAWN_TILE_4,
   SPAWN_WEIGHT_2,
@@ -14,17 +13,17 @@ import {
 import type { Board, CellValue } from '@/types';
 
 /**
- * Creates an empty 4x4 board filled with zeros.
- * @returns A new Board of length CELL_COUNT
+ * Creates an empty square board filled with zeros.
+ * @param boardSize - Cells per axis (default Classic 4)
  */
-export function createEmptyBoard(): Board {
-  return Array.from({ length: CELL_COUNT }, () => 0 as CellValue);
+export function createEmptyBoard(boardSize: number = BOARD_SIZE): Board {
+  const cellCount = boardSize * boardSize;
+  return Array.from({ length: cellCount }, () => 0 as CellValue);
 }
 
 /**
  * Returns flat indices of all empty cells.
  * @param board - Current board (read-only)
- * @returns Array of empty cell indices
  */
 export function getEmptyCells(board: Readonly<Board>): number[] {
   return board.flatMap((value, index) => (value === 0 ? [index] : []));
@@ -33,7 +32,6 @@ export function getEmptyCells(board: Readonly<Board>): number[] {
 /**
  * Deep-clones a board so callers never share mutable references.
  * @param board - Source board
- * @returns Independent board copy
  */
 export function cloneBoard(board: Readonly<Board>): Board {
   return structuredClone(board) as Board;
@@ -43,7 +41,6 @@ export function cloneBoard(board: Readonly<Board>): Board {
  * Spawns a 2 (90%) or 4 (10%) into a random empty cell.
  * @param board - Current board (not mutated)
  * @param rng - Injected RNG in [0, 1); defaults to Math.random
- * @returns New board with one spawned tile, or a copy if no empty cells
  */
 export function spawnTile(
   board: Readonly<Board>,

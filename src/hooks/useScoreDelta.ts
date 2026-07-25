@@ -48,8 +48,7 @@ export function useScoreDelta(): UseScoreDeltaResult {
       }
       setAmount(delta);
       setVisible(true);
-      // eslint-disable-next-line react-hooks/immutability -- intentional shared value write
-      progress.value = 0;
+      progress.set(0);
       const duration = reducedMotion
         ? REDUCED_MOTION_DURATION_MS
         : SCORE_DELTA_DURATION_MS;
@@ -57,22 +56,20 @@ export function useScoreDelta(): UseScoreDeltaResult {
         hide();
         return;
       }
-      progress.value = withTiming(
-        1,
-        { duration, easing: Easing.out(Easing.quad) },
-        (finished) => {
+      progress.set(
+        withTiming(1, { duration, easing: Easing.out(Easing.quad) }, (finished) => {
           if (finished) {
             runOnJS(hide)();
           }
-        },
+        }),
       );
     },
     [hide, progress, reducedMotion],
   );
 
   const animatedStyle = useAnimatedStyle(() => ({
-    opacity: 1 - progress.value,
-    transform: [{ translateY: -SCORE_DELTA_TRAVEL_DP * progress.value }],
+    opacity: 1 - progress.get(),
+    transform: [{ translateY: -SCORE_DELTA_TRAVEL_DP * progress.get() }],
   }));
 
   return { amount, visible, play, animatedStyle };

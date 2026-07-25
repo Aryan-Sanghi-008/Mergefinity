@@ -15,13 +15,15 @@ import { AnimatedTile } from './AnimatedTile';
 export interface BoardTileLayerProps {
   /** Visual tile entities with stable IDs. */
   tiles: BoardTileEntity[];
+  /** Cells per axis for layout math. */
+  cellCount: number;
 }
 
 /**
  * Absolute tile overlay — keys by stable entity id across moves and theme swaps.
  */
-const BoardTileLayer = memo(({ tiles }: BoardTileLayerProps) => {
-  const { tileSize, cellOffsets } = useBoardDimensions();
+const BoardTileLayer = memo(({ tiles, cellCount }: BoardTileLayerProps) => {
+  const { tileSize, cellOffsets } = useBoardDimensions(cellCount);
 
   return (
     <View style={styles.layer} pointerEvents="box-none">
