@@ -17,6 +17,7 @@ import type {
 } from '@/types';
 
 import { analytics } from './middleware/analytics.middleware';
+import { audioAchievements } from './middleware/audio.middleware';
 
 function createLockedProgress(): Record<AchievementId, AchievementProgress> {
   const progress = {} as Record<AchievementId, AchievementProgress>;
@@ -32,7 +33,8 @@ function createLockedProgress(): Record<AchievementId, AchievementProgress> {
 export const useAchievementStore = create<AchievementStore>()(
   devtools(
     persist(
-      analytics((set, get) => ({
+      analytics(
+        audioAchievements((set, get) => ({
         progress: createLockedProgress(),
         unlock: (id) => {
           const current = get().progress[id];
@@ -75,6 +77,7 @@ export const useAchievementStore = create<AchievementStore>()(
         },
         resetAchievements: () => set({ progress: createLockedProgress() }),
       })),
+      ),
       {
         name: STORAGE_KEYS.ACHIEVEMENTS,
         storage: createJSONStorage(() => AsyncStorage),

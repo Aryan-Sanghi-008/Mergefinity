@@ -26,6 +26,8 @@ import { STRINGS } from '@/constants';
 import {
   useHapticsEnabled,
   useSetHapticsEnabled,
+  useSetSoundEnabled,
+  useSoundEnabled,
 } from '@/hooks/useSettings';
 import { useResetStats } from '@/hooks/useStats';
 import { useThemePreference } from '@/hooks/useThemePreference';
@@ -50,6 +52,8 @@ const SettingsScreen = memo(() => {
   const insets = useSafeAreaInsets();
   const hapticsEnabled = useHapticsEnabled();
   const setHapticsEnabled = useSetHapticsEnabled();
+  const soundEnabled = useSoundEnabled();
+  const setSoundEnabled = useSetSoundEnabled();
   const resetStats = useResetStats();
   const {
     savedTheme,
@@ -71,6 +75,13 @@ const SettingsScreen = memo(() => {
       setHapticsEnabled(next);
     },
     [setHapticsEnabled],
+  );
+
+  const onSoundChange = useCallback(
+    (next: boolean) => {
+      setSoundEnabled(next);
+    },
+    [setSoundEnabled],
   );
 
   const onSystemDarkChange = useCallback(
@@ -181,6 +192,11 @@ const SettingsScreen = memo(() => {
             label={STRINGS.SETTINGS_HAPTICS}
             value={hapticsEnabled}
             onValueChange={onHapticsChange}
+          />
+          <SettingsToggleRow
+            label={STRINGS.SETTINGS_SOUND}
+            value={soundEnabled}
+            onValueChange={onSoundChange}
           />
           <Pressable
             style={styles.resetButton}

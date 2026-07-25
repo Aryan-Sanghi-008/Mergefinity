@@ -82,3 +82,9 @@ export {
   ACHIEVEMENT_VETERAN_GAMES,
   MAX_SESSION_HISTORY,
 } from './achievement.constants';
+
+export {
+  MERGE_SFX_HIGH_THRESHOLD,
+  SLIDE_PITCH_BY_DIRECTION,
+} from './sound.constants';
+export type { SoundId } from './sound.constants';

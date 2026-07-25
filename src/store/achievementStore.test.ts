@@ -8,6 +8,15 @@ import { ACHIEVEMENT_IDS } from '@/constants';
 
 import { useAchievementStore } from './achievementStore';
 
+jest.mock('@/utils/sound.utils', () => ({
+  SoundManager: {
+    play: jest.fn(),
+    playSlide: jest.fn(),
+    setEnabled: jest.fn(),
+    preload: jest.fn(async () => undefined),
+  },
+}));
+
 jest.mock('@react-native-async-storage/async-storage', () =>
   jest.requireActual(
     '@react-native-async-storage/async-storage/jest/async-storage-mock',

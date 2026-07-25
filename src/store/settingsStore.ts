@@ -13,6 +13,7 @@ import { DEFAULT_THEME_NAME } from '@/styles';
 import type { SettingsStore } from '@/types';
 
 import { analytics } from './middleware/analytics.middleware';
+import { audioSettings } from './middleware/audio.middleware';
 
 /**
  * Settings store — everything persisted per game plan.
@@ -21,7 +22,8 @@ import { analytics } from './middleware/analytics.middleware';
 export const useSettingsStore = create<SettingsStore>()(
   devtools(
     persist(
-      analytics((set) => ({
+      analytics(
+        audioSettings((set) => ({
         theme: DEFAULT_THEME_NAME,
         followSystemDark: false,
         hapticsEnabled: true,
@@ -33,6 +35,7 @@ export const useSettingsStore = create<SettingsStore>()(
         setFollowSystemDark: (enabled) => set({ followSystemDark: enabled }),
         setBoardSize: (boardSize) => set({ boardSize }),
       })),
+      ),
       {
         name: STORAGE_KEYS.SETTINGS,
         storage: createJSONStorage(() => AsyncStorage),

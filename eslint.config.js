@@ -38,9 +38,10 @@ module.exports = [
     },
   },
   {
-    // Expo Router screens and config files require default exports.
+    // Expo Router screens, config, and ambient asset modules require default exports.
     files: [
       'src/app/**/*.{ts,tsx}',
+      'src/types/assets.d.ts',
       '*.config.js',
       'babel.config.js',
       'eslint.config.js',

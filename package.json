@@ -18,6 +18,7 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "^57.0.7",
+    "expo-av": "^16.0.8",
     "expo-constants": "~57.0.6",
     "expo-font": "~57.0.1",
     "expo-haptics": "~57.0.1",
@@ -64,7 +65,8 @@
       "**/?(*.)+(spec|test).[jt]s?(x)"
     ],
     "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "\\.wav$": "<rootDir>/jest/assetMock.js"
     },
     "collectCoverageFrom": [
       "src/engine/**/*.ts",

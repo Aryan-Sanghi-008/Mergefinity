@@ -8,6 +8,12 @@ export { useAchievementStore } from './achievementStore';
 export { useGameStore } from './gameStore';
 export type { GamePersistedSlice } from './gameStore';
 export { analytics } from './middleware/analytics.middleware';
+export {
+  audioAchievements,
+  audioGame,
+  audioSettings,
+  playCommitMoveSounds,
+} from './middleware/audio.middleware';
 export { usePurchaseStore } from './purchaseStore';
 export { useSettingsStore } from './settingsStore';
 export { useStatsStore } from './statsStore';

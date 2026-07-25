@@ -316,6 +316,7 @@ export function useGameEngine(): GameEngineState {
             board: afterSpawn,
             scoreDelta: result.scoreDelta,
             mergeValues: mergeValuesFromMoves(result.tileMoves),
+            direction,
           });
           if (result.scoreDelta > 0) {
             scoreDelta.play(result.scoreDelta);

@@ -21,6 +21,7 @@ import { createFreshBoard } from '@/utils/createFreshBoard';
 import { maxBoardTile } from '@/utils/statsHelpers';
 
 import { analytics } from './middleware/analytics.middleware';
+import { audioGame } from './middleware/audio.middleware';
 import { useStatsStore } from './statsStore';
 
 /** Fields restored after app kill (DoD — exact board resume). */
@@ -114,7 +115,8 @@ function recordTerminalIfNeeded(
 export const useGameStore = create<GameStore>()(
   devtools(
     persist(
-      analytics((set, get) => ({
+      analytics(
+        audioGame((set, get) => ({
         ...createInitialState('classic'),
 
         commitMove: ({ board, scoreDelta, mergeValues }) => {
@@ -252,6 +254,7 @@ export const useGameStore = create<GameStore>()(
           });
         },
       })),
+      ),
       {
         name: STORAGE_KEYS.GAME_STATE,
         storage: createJSONStorage(() => AsyncStorage),

@@ -11,6 +11,16 @@ import { createEmptyLifetimeStats, createEmptyStatsByMode } from '@/utils/statsD
 import { useGameStore } from './gameStore';
 import { useStatsStore } from './statsStore';
 
+jest.mock('@/utils/sound.utils', () => ({
+  SoundManager: {
+    play: jest.fn(),
+    playSlide: jest.fn(),
+    setEnabled: jest.fn(),
+    preload: jest.fn(async () => undefined),
+    resetForTests: jest.fn(),
+  },
+}));
+
 jest.mock('@react-native-async-storage/async-storage', () =>
   jest.requireActual(
     '@react-native-async-storage/async-storage/jest/async-storage-mock',
@@ -56,6 +66,7 @@ describe('useGameStore', () => {
       board: next,
       scoreDelta: 4,
       mergeValues: [4],
+      direction: 'LEFT',
     });
     const state = useGameStore.getState();
     expect(state.board).toEqual(next);
@@ -70,6 +81,7 @@ describe('useGameStore', () => {
       board: useGameStore.getState().board,
       scoreDelta: 200,
       mergeValues: [],
+      direction: 'LEFT',
     });
     expect(useStatsStore.getState().getBestScore('classic')).toBeGreaterThanOrEqual(200);
   });
@@ -79,6 +91,7 @@ describe('useGameStore', () => {
       board: useGameStore.getState().board,
       scoreDelta: 4,
       mergeValues: [4 as CellValue, 8],
+      direction: 'LEFT',
     });
     expect(useStatsStore.getState().byMode.classic.totalMerges).toBe(2);
     expect(useStatsStore.getState().lifetime.mergeHistogram[4]).toBe(1);
@@ -93,6 +106,7 @@ describe('useGameStore', () => {
       board: winBoard,
       scoreDelta: 2048,
       mergeValues: [2048],
+      direction: 'LEFT',
     });
     expect(useGameStore.getState().status).toBe('won');
     expect(useGameStore.getState().statsRecorded).toBe(true);
@@ -107,6 +121,7 @@ describe('useGameStore', () => {
       board: lossBoard,
       scoreDelta: 0,
       mergeValues: [],
+      direction: 'LEFT',
     });
     expect(useGameStore.getState().status).toBe('lost');
     expect(useStatsStore.getState().byMode.classic.wins).toBe(1);
@@ -122,6 +137,7 @@ describe('useGameStore', () => {
       board: after,
       scoreDelta: 4,
       mergeValues: [4],
+      direction: 'LEFT',
     });
     useGameStore.getState().undo();
     const state = useGameStore.getState();
@@ -139,6 +155,7 @@ describe('useGameStore', () => {
         ]),
         scoreDelta: 2,
         mergeValues: [],
+        direction: 'LEFT',
       });
       useGameStore.getState().undo();
     }
@@ -149,6 +166,7 @@ describe('useGameStore', () => {
       ]),
       scoreDelta: 8,
       mergeValues: [],
+      direction: 'LEFT',
     });
     useGameStore.getState().undo();
     expect(useGameStore.getState().undosRemaining).toBe(0);
@@ -167,6 +185,7 @@ describe('useGameStore', () => {
       ]),
       scoreDelta: 2,
       mergeValues: [],
+      direction: 'LEFT',
     });
     useGameStore.getState().undo();
     expect(useGameStore.getState().undosRemaining).toBe(UNDO_UNLIMITED);
@@ -195,6 +214,7 @@ describe('useGameStore', () => {
       board: Array.from({ length: 25 }, () => 0) as Board,
       scoreDelta: 50,
       mergeValues: [],
+      direction: 'LEFT',
     });
     useGameStore.getState().restart();
     const state = useGameStore.getState();

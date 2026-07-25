@@ -1,8 +1,9 @@
 /**
  * @file _layout.tsx
  * @layer app
- * @description Root layout — GestureHandlerRootView, ThemeProvider, stack (P-14).
+ * @description Root layout — GestureHandlerRootView, ThemeProvider, audio preload (P-14 / P-15).
  */
+import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';
@@ -10,6 +11,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { ThemeProvider } from '@/context/ThemeContext';
 import { useTheme } from '@/hooks/useTheme';
+import { SoundManager } from '@/utils/sound.utils';
 
 /**
  * Status bar synced to active theme luminance.
@@ -22,12 +24,23 @@ function ThemedStatusBar() {
 }
 
 /**
+ * Preloads SFX once at app start (P-15 latency DoD).
+ */
+function AudioBootstrap() {
+  useEffect(() => {
+    void SoundManager.preload();
+  }, []);
+  return null;
+}
+
+/**
  * Root application layout.
  */
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <ThemeProvider>
+        <AudioBootstrap />
         <ThemedStatusBar />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />

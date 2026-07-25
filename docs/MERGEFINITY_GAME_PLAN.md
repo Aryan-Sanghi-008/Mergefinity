@@ -819,9 +819,9 @@ src/store/middleware/audio.middleware.ts
 
 ### Definition of Done
 
-- [ ] Audio disabled toggle in settings silences all sounds within the current gesture
-- [ ] Audio does not play when the device is in silent mode on iOS
-- [ ] Sound playback introduces zero perceptible latency on a mid-range Android device
+- [x] Audio disabled toggle in settings silences all sounds within the current gesture
+- [x] Audio does not play when the device is in silent mode on iOS
+- [x] Sound playback introduces zero perceptible latency on a mid-range Android device
 
 ---
 

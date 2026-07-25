@@ -4,7 +4,14 @@
  * @description Zustand store state and action contracts.
  */
 
-import type { Board, CellValue, GameMode, GameSnapshot, ThemeName } from './game.types';
+import type {
+  Board,
+  CellValue,
+  Direction,
+  GameMode,
+  GameSnapshot,
+  ThemeName,
+} from './game.types';
 import type { AchievementId, AchievementProgress } from './achievement.types';
 import type {
   GameStats,
@@ -59,6 +66,8 @@ export interface CommitMovePayload {
   scoreDelta: number;
   /** Post-merge tile values created this move (one per merge). */
   mergeValues: CellValue[];
+  /** Swipe direction (slide SFX pitch). */
+  direction: Direction;
 }
 
 /** Imperative store actions. */

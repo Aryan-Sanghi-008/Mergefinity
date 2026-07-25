@@ -7,10 +7,14 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+.metro-health-check*
+.metro-cache/
 
-# Native (prebuild / EAS local)
-android/
-ios/
+# Native (prebuild / EAS local — CNG artifacts)
+/android
+/ios
+.kotlin/
+.cxx/
 *.jks
 *.p8
 *.p12
@@ -18,6 +22,8 @@ ios/
 *.mobileprovision
 *.pem
 *.orig.*
+*.xcuserstate
+*.jsbundle
 
 # EAS credentials & secrets (never commit)
 credentials.json
@@ -35,7 +41,6 @@ npm-debug.*
 yarn-debug.*
 yarn-error.*
 *.log
-*.jsbundle
 
 # Tests & coverage
 coverage/
@@ -45,7 +50,6 @@ junit.xml
 
 # TypeScript / bundler / linter caches
 *.tsbuildinfo
-.metro-cache/
 .cache/
 .eslintcache
 .prettiercache
