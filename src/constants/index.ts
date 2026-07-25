@@ -102,3 +102,8 @@ export {
   SLIDE_PITCH_BY_DIRECTION,
 } from './sound.constants';
 export type { SoundId } from './sound.constants';
+
+export {
+  ANALYTICS_EVENTS,
+  RATING_PROMPT_AFTER_WINS,
+} from './analytics.constants';

@@ -7,7 +7,14 @@
 export { useAchievementStore } from './achievementStore';
 export { useGameStore } from './gameStore';
 export type { GamePersistedSlice } from './gameStore';
-export { analytics } from './middleware/analytics.middleware';
+export {
+  analytics,
+  analyticsGame,
+  analyticsSettings,
+  logGameTerminal,
+  maybeLogTileReached,
+  resetSessionTilePeak,
+} from './middleware/analytics.middleware';
 export {
   audioAchievements,
   audioGame,

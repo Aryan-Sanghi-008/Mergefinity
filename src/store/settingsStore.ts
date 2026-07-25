@@ -12,7 +12,10 @@ import { BOARD_SIZE, STORAGE_KEYS } from '@/constants';
 import { DEFAULT_THEME_NAME } from '@/styles';
 import type { SettingsStore } from '@/types';
 
-import { analytics } from './middleware/analytics.middleware';
+import {
+  analytics,
+  analyticsSettings,
+} from './middleware/analytics.middleware';
 import { audioSettings } from './middleware/audio.middleware';
 
 /**
@@ -23,6 +26,7 @@ export const useSettingsStore = create<SettingsStore>()(
   devtools(
     persist(
       analytics(
+        analyticsSettings(
         audioSettings((set) => ({
         theme: DEFAULT_THEME_NAME,
         followSystemDark: false,
@@ -35,6 +39,7 @@ export const useSettingsStore = create<SettingsStore>()(
         setFollowSystemDark: (enabled) => set({ followSystemDark: enabled }),
         setBoardSize: (boardSize) => set({ boardSize }),
       })),
+        ),
       ),
       {
         name: STORAGE_KEYS.SETTINGS,

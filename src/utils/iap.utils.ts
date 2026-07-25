@@ -7,12 +7,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
+  ANALYTICS_EVENTS,
   IAP_PRODUCT_IDS,
   IAP_STUB_ACK_DELAY_MS,
   STORAGE_KEYS,
   type IapProductId,
 } from '@/constants';
 import { usePurchaseStore } from '@/store/purchaseStore';
+import { logAnalyticsEvent } from '@/utils/analytics.utils';
 
 /** Persisted stub receipt map (survives force-close after optimistic grant). */
 export interface IapReceipts {
@@ -66,6 +68,14 @@ export async function purchase(productId: IapProductId): Promise<void> {
   await new Promise<void>((resolve) => {
     setTimeout(resolve, IAP_STUB_ACK_DELAY_MS);
   });
+  logAnalyticsEvent(ANALYTICS_EVENTS.IAP_COMPLETED, { product_id: productId });
+}
+
+/**
+ * Log `iap_initiated` when a purchase sheet is presented.
+ */
+export function trackIapInitiated(productId: IapProductId): void {
+  logAnalyticsEvent(ANALYTICS_EVENTS.IAP_INITIATED, { product_id: productId });
 }
 
 /**

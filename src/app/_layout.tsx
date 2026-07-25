@@ -1,7 +1,7 @@
 /**
  * @file _layout.tsx
  * @layer app
- * @description Root layout — splash, theme, audio, ads consent, IAP sync (P-14–P-19).
+ * @description Root layout — splash, theme, audio, ads, IAP, telemetry (P-14–P-20).
  */
 import { useEffect } from 'react';
 import { Alert, AppState, StyleSheet } from 'react-native';
@@ -14,6 +14,8 @@ import { STRINGS } from '@/constants';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { useTheme } from '@/hooks/useTheme';
 import { setConsentPrompter } from '@/utils/ads.utils';
+import { initAnalytics } from '@/utils/analytics.utils';
+import { initCrashlytics } from '@/utils/crashlytics.utils';
 import { syncPurchases } from '@/utils/iap.utils';
 import { SoundManager } from '@/utils/sound.utils';
 
@@ -59,6 +61,17 @@ function SplashBootstrap() {
     };
   }, []);
 
+  return null;
+}
+
+/**
+ * Firebase Analytics + Crashlytics bootstrap (P-20 stubs until native config).
+ */
+function TelemetryBootstrap() {
+  useEffect(() => {
+    initAnalytics();
+    initCrashlytics();
+  }, []);
   return null;
 }
 
@@ -119,6 +132,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.root}>
       <ThemeProvider>
         <SplashBootstrap />
+        <TelemetryBootstrap />
         <AudioBootstrap />
         <MonetizationBootstrap />
         <ThemedStatusBar />

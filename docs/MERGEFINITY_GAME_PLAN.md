@@ -1057,7 +1057,7 @@ docs/ANALYTICS_EVENTS.md
 
 - [ ] Crash-free sessions rate above 99.5% on day 1 of production rollout
 - [ ] All 8 Analytics events verified as flowing in Firebase DebugView within the first hour of rollout
-- [ ] Play Store rating prompt appears correctly after a player's 3rd win (and not before)
+- [x] Play Store rating prompt appears correctly after a player's 3rd win (and not before) — implemented via `expo-store-review` + `rating.utils` (verify on device before ship)
 
 ---
 

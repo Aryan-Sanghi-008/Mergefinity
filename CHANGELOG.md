@@ -10,3 +10,4 @@ First public release.
 - Five themes, twenty achievements, and local statistics.
 - Haptics, sound, undo, and polished board motion.
 - First-launch swipe onboarding, splash, and store-ready brand assets.
+- Launch telemetry stubs (eight analytics events + Crashlytics hooks) and Play Store rating prompt after the third win.

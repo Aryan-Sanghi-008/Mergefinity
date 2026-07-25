@@ -24,6 +24,8 @@ export const STORAGE_KEYS = {
   /** Count of losses considered for interstitial cadence. */
   ADS_LOSS_COUNTER: 'mergefinity:ads_loss_counter',
   ONBOARDING_COMPLETE: 'mergefinity:onboarding_complete',
+  /** Whether the Play Store rating prompt has already been shown. */
+  RATING_PROMPT_SHOWN: 'mergefinity:rating_prompt_shown',
 } as const;
 
 /** Union of all storage key string values. */

@@ -63,3 +63,15 @@ export type {
   TabName,
   TileMotionPhase,
 } from './ui.types';
+
+export type {
+  AnalyticsDebugEvent,
+  AnalyticsEventName,
+  AnalyticsParamValue,
+  AnalyticsParams,
+  GameEndAnalyticsParams,
+  GameStartParams,
+  IapAnalyticsParams,
+  ThemeChangedParams,
+  TileReachedParams,
+} from './analytics.types';

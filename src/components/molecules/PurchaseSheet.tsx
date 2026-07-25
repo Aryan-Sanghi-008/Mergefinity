@@ -4,7 +4,7 @@
  * @description Bottom purchase sheet with loading state (P-16).
  */
 
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -15,9 +15,10 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { STRINGS } from '@/constants';
+import { IAP_PRODUCT_IDS, STRINGS } from '@/constants';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, TYPOGRAPHY, type ThemeTokens } from '@/styles';
+import { trackIapInitiated } from '@/utils/iap.utils';
 
 export type PurchaseSheetVariant = 'themebundle' | 'removeads';
 
@@ -48,6 +49,17 @@ const PurchaseSheet = memo(
     const { theme } = useTheme();
     const insets = useSafeAreaInsets();
     const styles = useMemo(() => createStyles(theme), [theme]);
+
+    useEffect(() => {
+      if (!visible) {
+        return;
+      }
+      trackIapInitiated(
+        variant === 'removeads'
+          ? IAP_PRODUCT_IDS.REMOVE_ADS
+          : IAP_PRODUCT_IDS.THEME_BUNDLE,
+      );
+    }, [visible, variant]);
 
     const title =
       variant === 'removeads'

@@ -10,6 +10,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '@/components/atoms';
 import { STRINGS } from '@/constants';
 import { SPACING_TOKENS, TYPOGRAPHY } from '@/styles';
+import { recordCrashlyticsError } from '@/utils/crashlytics.utils';
 
 export interface GameErrorBoundaryProps {
   /** Game screen tree. */
@@ -38,6 +39,9 @@ export class GameErrorBoundary extends Component<
   }
 
   public componentDidCatch(error: Error, info: ErrorInfo): void {
+    recordCrashlyticsError(error, {
+      componentStack: info.componentStack ?? '',
+    });
     if (__DEV__) {
       // eslint-disable-next-line no-console -- intentional boundary diagnostics
       console.error('[GameErrorBoundary]', error, info.componentStack);

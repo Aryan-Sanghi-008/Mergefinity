@@ -20,7 +20,10 @@ import type { GameMode, GameSnapshot, GameStore } from '@/types';
 import { createFreshBoard } from '@/utils/createFreshBoard';
 import { maxBoardTile } from '@/utils/statsHelpers';
 
-import { analytics } from './middleware/analytics.middleware';
+import {
+  analytics,
+  analyticsGame,
+} from './middleware/analytics.middleware';
 import { audioGame } from './middleware/audio.middleware';
 import { useStatsStore } from './statsStore';
 
@@ -116,6 +119,7 @@ export const useGameStore = create<GameStore>()(
   devtools(
     persist(
       analytics(
+        analyticsGame(
         audioGame((set, get) => ({
         ...createInitialState('classic'),
 
@@ -254,6 +258,7 @@ export const useGameStore = create<GameStore>()(
           });
         },
       })),
+        ),
       ),
       {
         name: STORAGE_KEYS.GAME_STATE,

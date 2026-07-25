@@ -23,6 +23,8 @@ export const CHANGELOG_ENTRIES: readonly ChangelogEntry[] = [
       'Classic, Endless, Challenge, and Time Attack modes.',
       'Five themes, twenty achievements, and local statistics.',
       'Haptics, sound, undo, and polished board motion.',
+      'First-launch onboarding and store-ready brand assets.',
+      'Launch analytics, Crashlytics hooks, and rating prompt after the third win.',
     ],
   },
 ] as const;

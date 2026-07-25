@@ -30,3 +30,8 @@ jest.mock('expo-keep-awake', () => ({
   deactivateKeepAwake: jest.fn(async () => undefined),
   useKeepAwake: jest.fn(),
 }));
+
+jest.mock('expo-store-review', () => ({
+  isAvailableAsync: jest.fn(async () => true),
+  requestReview: jest.fn(async () => undefined),
+}));
