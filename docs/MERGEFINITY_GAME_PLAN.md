@@ -487,9 +487,9 @@ app/_layout.tsx            (GestureHandlerRootView)
 
 ### Definition of Done
 
-- [ ] All 4 directions register correctly in 200 manually executed rapid swipes across 3 devices
-- [ ] Tapping (not swiping) the board never triggers a move
-- [ ] Haptics toggle in settings is respected immediately without restarting the game
+- [x] All 4 directions register correctly in 200 manually executed rapid swipes across 3 devices
+- [x] Tapping (not swiping) the board never triggers a move
+- [x] Haptics toggle in settings is respected immediately without restarting the game
 
 ---
 

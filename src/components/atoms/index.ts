@@ -17,7 +17,7 @@ export { IconGlyph } from './glyphs';
 export type { IconGlyphProps } from './glyphs';
 
 export { PrimaryButton } from './PrimaryButton';
-export type { PrimaryButtonProps } from './PrimaryButton';
+export type { PrimaryButtonHaptic, PrimaryButtonProps } from './PrimaryButton';
 
 export { ScoreLabel } from './ScoreLabel';
 export type { ScoreLabelKind, ScoreLabelProps } from './ScoreLabel';

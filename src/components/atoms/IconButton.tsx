@@ -4,7 +4,6 @@
  * @description 44×44dp icon pressable with geometric glyph.
  */
 
-import * as Haptics from 'expo-haptics';
 import { memo, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, type GestureResponderEvent } from 'react-native';
 
@@ -12,6 +11,7 @@ import { IconGlyph } from '@/components/atoms/glyphs';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS } from '@/styles';
 import type { IconName } from '@/types';
+import { hapticSelection } from '@/utils/haptics.utils';
 
 export interface IconButtonProps {
   /** Icon glyph name. */
@@ -48,7 +48,7 @@ const IconButton = memo(
         if (disabled) {
           return;
         }
-        void Haptics.selectionAsync();
+        hapticSelection();
         onPress(event);
       },
       [disabled, onPress],

@@ -4,7 +4,7 @@
  * @description Zustand game store state and action contracts.
  */
 
-import type { Board, Direction, GameMode, GameSnapshot } from './game.types';
+import type { Board, Direction, GameMode, GameSnapshot, ThemeName } from './game.types';
 
 /**
  * Finite game status machine.
@@ -46,3 +46,30 @@ export interface GameActions {
 
 /** Combined Zustand store shape. */
 export type GameStore = GameState & GameActions;
+
+/** Settings slice (persisted). */
+export interface SettingsState {
+  /** Active visual theme name. */
+  theme: ThemeName;
+  /** Whether haptic feedback is enabled. */
+  hapticsEnabled: boolean;
+  /** Whether sound effects are enabled. */
+  soundEnabled: boolean;
+  /** Board cells per axis (Classic default 4). */
+  boardSize: number;
+}
+
+/** Settings store actions. */
+export interface SettingsActions {
+  /** Toggle or set haptics. */
+  setHapticsEnabled: (enabled: boolean) => void;
+  /** Toggle or set sound. */
+  setSoundEnabled: (enabled: boolean) => void;
+  /** Set theme preference (UI may still use ThemeContext until P-13). */
+  setTheme: (theme: ThemeName) => void;
+  /** Set board size preference. */
+  setBoardSize: (boardSize: number) => void;
+}
+
+/** Combined settings Zustand store. */
+export type SettingsStore = SettingsState & SettingsActions;

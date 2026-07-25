@@ -1,42 +1,71 @@
 /**
  * @file settings.tsx
  * @layer app
- * @description Settings screen — thin shell with link to theme lab (P-04).
+ * @description Settings — gameplay haptics toggle (P-08) + theme lab link.
  */
+
 import { Link } from 'expo-router';
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { SettingsToggleRow } from '@/components/molecules';
 import { STRINGS } from '@/constants';
+import {
+  useHapticsEnabled,
+  useSetHapticsEnabled,
+} from '@/hooks/useSettings';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, TYPOGRAPHY, type ThemeTokens } from '@/styles';
 
 /**
- * Settings screen placeholder.
+ * Settings screen — haptics toggle applies immediately via settingsStore.
  */
 const SettingsScreen = memo(() => {
   const { theme } = useTheme();
+  const hapticsEnabled = useHapticsEnabled();
+  const setHapticsEnabled = useSetHapticsEnabled();
   const styles = useMemo(() => createStyles(theme), [theme]);
+
+  const onHapticsChange = useCallback(
+    (next: boolean) => {
+      setHapticsEnabled(next);
+    },
+    [setHapticsEnabled],
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title} allowFontScaling={false}>
         {STRINGS.SETTINGS_TITLE}
       </Text>
-      <Text style={styles.sub} allowFontScaling={false}>
-        {STRINGS.SETTINGS_PLACEHOLDER}
-      </Text>
-      <Link href="/theme-lab" asChild>
-        <Pressable
-          style={styles.labButton}
-          accessibilityRole="button"
-          accessibilityLabel={STRINGS.THEME_LAB_OPEN}
-        >
-          <Text style={styles.labButtonText} allowFontScaling={false}>
-            {STRINGS.THEME_LAB_OPEN}
-          </Text>
-        </Pressable>
-      </Link>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle} allowFontScaling={false}>
+          {STRINGS.SETTINGS_SECTION_GAMEPLAY}
+        </Text>
+        <SettingsToggleRow
+          label={STRINGS.SETTINGS_HAPTICS}
+          value={hapticsEnabled}
+          onValueChange={onHapticsChange}
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle} allowFontScaling={false}>
+          {STRINGS.SETTINGS_SECTION_THEME}
+        </Text>
+        <Link href="/theme-lab" asChild>
+          <Pressable
+            style={styles.labButton}
+            accessibilityRole="button"
+            accessibilityLabel={STRINGS.THEME_LAB_OPEN}
+          >
+            <Text style={styles.labButtonText} allowFontScaling={false}>
+              {STRINGS.THEME_LAB_OPEN}
+            </Text>
+          </Pressable>
+        </Link>
+      </View>
     </View>
   );
 });
@@ -47,21 +76,22 @@ function createStyles(theme: ThemeTokens) {
   return StyleSheet.create({
     container: {
       flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
       backgroundColor: theme.SURFACE,
       padding: SPACING_TOKENS.SCREEN_PADDING,
     },
     title: {
       ...TYPOGRAPHY.title,
       color: theme.TEXT_PRIMARY,
-      marginBottom: SPACING_TOKENS.sm,
-    },
-    sub: {
-      ...TYPOGRAPHY.body,
-      color: theme.TEXT_MUTED,
       marginBottom: SPACING_TOKENS.lg,
-      textAlign: 'center',
+    },
+    section: {
+      marginBottom: SPACING_TOKENS.xl,
+    },
+    sectionTitle: {
+      ...TYPOGRAPHY.scoreLabel,
+      color: theme.TEXT_MUTED,
+      marginBottom: SPACING_TOKENS.sm,
+      textTransform: 'uppercase',
     },
     labButton: {
       minHeight: SPACING_TOKENS.TAP_TARGET_MIN,
@@ -72,6 +102,7 @@ function createStyles(theme: ThemeTokens) {
       backgroundColor: theme.BUTTON_BG,
       alignItems: 'center',
       justifyContent: 'center',
+      alignSelf: 'flex-start',
     },
     labButtonText: {
       ...TYPOGRAPHY.body,

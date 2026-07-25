@@ -50,6 +50,8 @@ export const STRINGS = {
   SETTINGS_HAPTICS: 'Haptics',
   SETTINGS_SOUND: 'Sound',
   SETTINGS_UNDO_LIMIT: 'Undo limit',
+  SETTINGS_ON: 'On',
+  SETTINGS_OFF: 'Off',
   SETTINGS_RATE_APP: 'Rate app',
   SETTINGS_PRIVACY: 'Privacy policy',
   SETTINGS_LICENSES: 'Licenses',

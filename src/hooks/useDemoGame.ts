@@ -30,6 +30,12 @@ import { useScoreDelta } from '@/hooks/useScoreDelta';
 import type { Board, BoardTileEntity, Direction, GameStatus } from '@/types';
 import { delay } from '@/utils/delay';
 import {
+  hapticGameOver,
+  hapticMerge,
+  hapticMove,
+  hapticWin,
+} from '@/utils/haptics.utils';
+import {
   createTileIdFactory,
   entitiesForMerge,
   entitiesForSlide,
@@ -162,6 +168,13 @@ export function useDemoGame(): DemoGameState {
         return;
       }
 
+      const hasMerge = result.tileMoves.some((move) => move.merged);
+      if (hasMerge) {
+        hapticMerge();
+      } else {
+        hapticMove();
+      }
+
       busyRef.current = true;
       lock();
       setStatus('animating');
@@ -211,8 +224,10 @@ export function useDemoGame(): DemoGameState {
           }
 
           if (!continuedAfterWin && isWon(afterSpawn)) {
+            hapticWin();
             setStatus('won');
           } else if (isLost(afterSpawn)) {
+            hapticGameOver();
             setStatus('lost');
           } else {
             setStatus('playing');

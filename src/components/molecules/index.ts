@@ -19,6 +19,9 @@ export type { ModeSelectorProps } from './ModeSelector';
 export { ScorePanel } from './ScorePanel';
 export type { ScorePanelProps } from './ScorePanel';
 
+export { SettingsToggleRow } from './SettingsToggleRow';
+export type { SettingsToggleRowProps } from './SettingsToggleRow';
+
 export { StatRow } from './StatRow';
 export type { StatRowProps } from './StatRow';
 

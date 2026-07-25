@@ -4,7 +4,6 @@
  * @description Themed primary pressable with haptic, disabled, and loading states.
  */
 
-import * as Haptics from 'expo-haptics';
 import { memo, useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
@@ -17,6 +16,9 @@ import {
 import { STRINGS } from '@/constants';
 import { useTheme } from '@/hooks/useTheme';
 import { SPACING_TOKENS, TYPOGRAPHY } from '@/styles';
+import { hapticLight, hapticNewGame } from '@/utils/haptics.utils';
+
+export type PrimaryButtonHaptic = 'light' | 'medium' | 'none';
 
 export interface PrimaryButtonProps {
   /** Button label. */
@@ -29,6 +31,8 @@ export interface PrimaryButtonProps {
   loading?: boolean;
   /** Accessibility label override. */
   accessibilityLabel?: string;
+  /** Haptic on press (gated by settings). Default light. */
+  haptic?: PrimaryButtonHaptic;
 }
 
 /**
@@ -41,6 +45,7 @@ const PrimaryButton = memo(
     disabled = false,
     loading = false,
     accessibilityLabel,
+    haptic = 'light',
   }: PrimaryButtonProps) => {
     const { theme } = useTheme();
     const isDisabled = disabled || loading;
@@ -54,10 +59,14 @@ const PrimaryButton = memo(
         if (isDisabled) {
           return;
         }
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        if (haptic === 'medium') {
+          hapticNewGame();
+        } else if (haptic === 'light') {
+          hapticLight();
+        }
         onPress(event);
       },
-      [isDisabled, onPress],
+      [isDisabled, onPress, haptic],
     );
 
     return (

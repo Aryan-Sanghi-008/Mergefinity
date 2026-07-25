@@ -74,6 +74,7 @@ const ControlBar = memo(
             label={STRINGS.NEW_GAME}
             onPress={onNewGame}
             accessibilityLabel={STRINGS.A11Y_NEW_GAME}
+            haptic="medium"
           />
         </View>
         <View style={styles.undoWrap}>

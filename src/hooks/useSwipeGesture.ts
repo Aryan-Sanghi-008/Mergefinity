@@ -1,7 +1,7 @@
 /**
  * @file useSwipeGesture.ts
  * @layer hooks
- * @description Pan swipe → Direction (P-07 early pull of P-08 gesture).
+ * @description Pan swipe → Direction with animation lock (P-08).
  */
 
 import { useMemo } from 'react';
@@ -10,10 +10,10 @@ import { runOnJS, type SharedValue } from 'react-native-reanimated';
 
 import {
   SWIPE_MIN_DISTANCE,
-  SWIPE_VELOCITY_DIAGONAL,
   SWIPE_VELOCITY_THRESHOLD,
 } from '@/constants';
 import type { Direction } from '@/types';
+import { resolveSwipeDirection } from '@/utils/swipeDirection';
 
 export interface UseSwipeGestureParams {
   /** Called on JS thread when a swipe resolves. */
@@ -41,31 +41,15 @@ export function useSwipeGesture({
             return;
           }
 
-          const { translationX, translationY, velocityX, velocityY } = event;
-          const absTx = Math.abs(translationX);
-          const absTy = Math.abs(translationY);
-          const absVx = Math.abs(velocityX);
-          const absVy = Math.abs(velocityY);
-          const speed = Math.hypot(velocityX, velocityY);
+          const direction = resolveSwipeDirection({
+            translationX: event.translationX,
+            translationY: event.translationY,
+            velocityX: event.velocityX,
+            velocityY: event.velocityY,
+          });
 
-          let horizontal: boolean;
-          if (speed > SWIPE_VELOCITY_DIAGONAL) {
-            horizontal = absVx >= absVy;
-          } else {
-            horizontal = absTx >= absTy;
-          }
-
-          let direction: Direction;
-          if (horizontal) {
-            if (absTx < SWIPE_MIN_DISTANCE && absVx < SWIPE_VELOCITY_THRESHOLD) {
-              return;
-            }
-            direction = translationX > 0 ? 'RIGHT' : 'LEFT';
-          } else {
-            if (absTy < SWIPE_MIN_DISTANCE && absVy < SWIPE_VELOCITY_THRESHOLD) {
-              return;
-            }
-            direction = translationY > 0 ? 'DOWN' : 'UP';
+          if (direction === null) {
+            return;
           }
 
           runOnJS(onSwipe)(direction);

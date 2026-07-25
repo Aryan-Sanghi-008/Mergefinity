@@ -22,6 +22,9 @@ export type {
   GameState,
   GameStatus,
   GameStore,
+  SettingsActions,
+  SettingsState,
+  SettingsStore,
 } from './store.types';
 
 export type {
