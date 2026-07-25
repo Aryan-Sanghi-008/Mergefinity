@@ -30,3 +30,9 @@ export const SCORE_DELTA_TRAVEL_DP = 40;
 
 /** Overlay fade/slide duration in ms. */
 export const OVERLAY_DURATION_MS = 300;
+
+/** Achievement toast auto-dismiss duration in ms. */
+export const TOAST_DURATION_MS = 3000;
+
+/** Toast slide travel distance in dp. */
+export const TOAST_TRAVEL_DP = 24;

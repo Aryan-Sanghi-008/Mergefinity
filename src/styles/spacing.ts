@@ -24,6 +24,34 @@ export const SPACING_TOKENS = {
   TAP_TARGET_MIN: 44,
   /** Fallback / preview tile edge length before useBoardDimensions. */
   TILE_SIZE: 72,
+  /** Hairline divider thickness. */
+  DIVIDER_THICKNESS: 0.5,
+  /** Icon glyph box inside IconButton. */
+  ICON_GLYPH_SIZE: 20,
+  /** Theme preview mini-tile size. */
+  THEME_PREVIEW_TILE: 28,
+  /** Icon geometry ratios (multiplied by glyph size). */
+  ICON_RING_RATIO: 0.7,
+  ICON_CHEVRON_RATIO: 0.35,
+  ICON_CHECK_W: 0.45,
+  ICON_CHECK_H: 0.25,
+  ICON_LOCK_BODY_W: 0.55,
+  ICON_LOCK_BODY_H: 0.4,
+  ICON_LOCK_SHACKLE_W: 0.35,
+  ICON_LOCK_SHACKLE_H: 0.3,
+  ICON_DOT_RATIO: 0.45,
+  ICON_GRID_RATIO: 0.75,
+  ICON_GRID_CELL_RATIO: 0.3,
+  ICON_THICKNESS_DIVISOR: 10,
+  ICON_MIN_THICKNESS: 2,
+  ICON_BAR_SHORT_RATIO: 0.6,
+  ICON_BAR_MID_RATIO: 0.85,
+  /** Muted glyph / preview opacity. */
+  OPACITY_MUTED: 0.85,
+  OPACITY_DISABLED: 0.45,
+  /** Common layout multipliers (avoids magic numbers in components). */
+  LAYOUT_DOUBLE: 2,
+  LAYOUT_TRIPLE: 3,
   /** Global spacing scale. */
   xs: 4,
   sm: 8,

@@ -31,6 +31,8 @@ export {
   SPAWN_DELAY_MS,
   SPAWN_DURATION_MS,
   SPAWN_INITIAL_SCALE,
+  TOAST_DURATION_MS,
+  TOAST_TRAVEL_DP,
 } from './animation.constants';
 
 export { SWIPE_MIN_DISTANCE, SWIPE_VELOCITY_THRESHOLD } from './gesture.constants';

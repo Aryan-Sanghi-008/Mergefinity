@@ -19,6 +19,9 @@ export const THEME_LAB_PREVIEW_VALUES: readonly CellValue[] = [
   2, 8, 2048, 131072,
 ];
 
+/** 2×2 theme picker preview values. */
+export const THEME_PREVIEW_VALUES: readonly CellValue[] = [2, 4, 8, 2048];
+
 /** All themes keyed by `ThemeName`. */
 export const THEMES: Record<ThemeName, ThemeTokens> = {
   classic: classicTheme,

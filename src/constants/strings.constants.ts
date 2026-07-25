@@ -90,6 +90,12 @@ export const STRINGS = {
   ACHIEVEMENT_LOCKED: 'Locked',
   ACHIEVEMENT_UNLOCKED: 'Unlocked',
 
+  // Status
+  STATUS_WIN: 'Win',
+  STATUS_LOSS: 'Loss',
+  STATUS_STREAK: 'Streak',
+  LOADING: 'Loading',
+
   // A11y (TalkBack)
   A11Y_SETTINGS: 'Settings',
   A11Y_UNDO: 'Undo',

@@ -29,6 +29,7 @@ export {
   getTheme,
   THEME,
   THEME_LAB_PREVIEW_VALUES,
+  THEME_PREVIEW_VALUES,
   THEMES,
 } from './theme';
 

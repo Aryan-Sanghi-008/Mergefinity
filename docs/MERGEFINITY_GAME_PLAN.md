@@ -355,9 +355,9 @@ src/components/molecules/index.ts
 
 ### Definition of Done
 
-- [ ] Every atom renders correctly with all 5 themes without any conditional logic inside the component
-- [ ] Every component is exported named from its `atoms/index.ts` or `molecules/index.ts` barrel
-- [ ] No component file imports from another component file directly — only from index barrels
+- [x] Every atom renders correctly with all 5 themes without any conditional logic inside the component
+- [x] Every component is exported named from its `atoms/index.ts` or `molecules/index.ts` barrel
+- [x] No component file imports from another component file directly — only from index barrels
 
 ---
 
