@@ -5,6 +5,7 @@
  */
 
 import { useSettingsStore } from '@/store/settingsStore';
+import type { ThemeName } from '@/types';
 
 /**
  * @returns Whether haptic feedback is enabled.
@@ -32,4 +33,18 @@ export function useSoundEnabled(): boolean {
  */
 export function useSetSoundEnabled(): (enabled: boolean) => void {
   return useSettingsStore((state) => state.setSoundEnabled);
+}
+
+/**
+ * @returns Persisted theme preference.
+ */
+export function useSavedTheme(): ThemeName {
+  return useSettingsStore((state) => state.theme);
+}
+
+/**
+ * @returns Whether Classic follows system dark mode.
+ */
+export function useFollowSystemDark(): boolean {
+  return useSettingsStore((state) => state.followSystemDark);
 }

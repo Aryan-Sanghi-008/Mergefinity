@@ -25,6 +25,9 @@ export type { MergeBarProps } from './MergeBar';
 export { ModeSelector } from './ModeSelector';
 export type { ModeSelectorProps } from './ModeSelector';
 
+export { PurchaseSheet } from './PurchaseSheet';
+export type { PurchaseSheetProps } from './PurchaseSheet';
+
 export { ScorePanel } from './ScorePanel';
 export type { ScorePanelProps } from './ScorePanel';
 
@@ -37,8 +40,12 @@ export type { SettingsToggleRowProps } from './SettingsToggleRow';
 export { StatRow } from './StatRow';
 export type { StatRowProps } from './StatRow';
 
+export { ThemePreviewCard } from './ThemePreviewCard';
+export type { ThemePreviewCardProps } from './ThemePreviewCard';
+
 export { ThemePreviewTile } from './ThemePreviewTile';
 export type { ThemePreviewTileProps } from './ThemePreviewTile';
 
 export { WinOverlay } from './WinOverlay';
 export type { WinOverlayProps } from './WinOverlay';
+

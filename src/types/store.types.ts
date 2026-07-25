@@ -88,6 +88,10 @@ export type GameStore = GameState & GameActions;
 export interface SettingsState {
   /** Active visual theme name. */
   theme: ThemeName;
+  /**
+   * When true and `theme` is Classic, follow OS light/dark (Classic ↔ Dark).
+   */
+  followSystemDark: boolean;
   /** Whether haptic feedback is enabled. */
   hapticsEnabled: boolean;
   /** Whether sound effects are enabled. */
@@ -102,8 +106,10 @@ export interface SettingsActions {
   setHapticsEnabled: (enabled: boolean) => void;
   /** Toggle or set sound. */
   setSoundEnabled: (enabled: boolean) => void;
-  /** Set theme preference (UI may still use ThemeContext until P-13). */
+  /** Set theme preference. */
   setTheme: (theme: ThemeName) => void;
+  /** Toggle Classic↔system dark follow. */
+  setFollowSystemDark: (enabled: boolean) => void;
   /** Set board size preference. */
   setBoardSize: (boardSize: number) => void;
 }

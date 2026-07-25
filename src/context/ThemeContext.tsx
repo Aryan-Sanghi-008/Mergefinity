@@ -7,23 +7,34 @@
 import {
   createContext,
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from 'react';
+import { Appearance } from 'react-native';
 
+import { useSettingsStore } from '@/store/settingsStore';
 import type { ThemeName } from '@/types';
-import { DEFAULT_THEME_NAME, getTheme } from '@/styles/theme';
+import { getTheme } from '@/styles/theme';
 import type { ThemeTokens } from '@/styles/theme.types';
+import {
+  resolveEffectiveTheme,
+  type ColorSchemeName,
+} from '@/utils/themeResolve';
 
 /** Theme context value. */
 export interface ThemeContextValue {
-  /** Active theme name. */
+  /** Active theme name (effective tokens). */
   themeName: ThemeName;
   /** Active token set. */
   theme: ThemeTokens;
-  /** Swap the active theme synchronously. */
+  /**
+   * Apply a temporary theme (premium preview) without writing settings.
+   */
   setThemeName: (name: ThemeName) => void;
+  /** Clear preview and show effective theme from settings + system. */
+  syncFromSettings: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -33,21 +44,48 @@ export { ThemeContext };
 export interface ThemeProviderProps {
   /** Tree to theme. */
   children: ReactNode;
-  /** Optional initial theme (defaults to classic). */
-  initialThemeName?: ThemeName;
+}
+
+function normalizeScheme(
+  scheme: ReturnType<typeof Appearance.getColorScheme>,
+): ColorSchemeName {
+  if (scheme === 'dark' || scheme === 'light') {
+    return scheme;
+  }
+  return null;
 }
 
 /**
- * Provides theme tokens to the tree. Swapping `themeName` re-renders consumers.
+ * Provides theme tokens to the tree. Swapping theme re-renders consumers.
  */
-export function ThemeProvider({
-  children,
-  initialThemeName = DEFAULT_THEME_NAME,
-}: ThemeProviderProps) {
-  const [themeName, setThemeNameState] = useState<ThemeName>(initialThemeName);
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const savedTheme = useSettingsStore((s) => s.theme);
+  const followSystemDark = useSettingsStore((s) => s.followSystemDark);
+  const [colorScheme, setColorScheme] = useState<ColorSchemeName>(() =>
+    normalizeScheme(Appearance.getColorScheme()),
+  );
+  const [previewTheme, setPreviewTheme] = useState<ThemeName | null>(null);
+
+  useEffect(() => {
+    const sub = Appearance.addChangeListener(({ colorScheme: next }) => {
+      setColorScheme(normalizeScheme(next));
+    });
+    return () => sub.remove();
+  }, []);
+
+  const themeName = useMemo(
+    () =>
+      previewTheme ??
+      resolveEffectiveTheme(savedTheme, followSystemDark, colorScheme),
+    [previewTheme, savedTheme, followSystemDark, colorScheme],
+  );
 
   const setThemeName = useCallback((name: ThemeName) => {
-    setThemeNameState(name);
+    setPreviewTheme(name);
+  }, []);
+
+  const syncFromSettings = useCallback(() => {
+    setPreviewTheme(null);
   }, []);
 
   const value = useMemo<ThemeContextValue>(
@@ -55,8 +93,9 @@ export function ThemeProvider({
       themeName,
       theme: getTheme(themeName),
       setThemeName,
+      syncFromSettings,
     }),
-    [themeName, setThemeName],
+    [themeName, setThemeName, syncFromSettings],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

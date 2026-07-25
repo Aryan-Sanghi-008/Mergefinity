@@ -741,9 +741,9 @@ app/themes.tsx
 
 ### Definition of Done
 
-- [ ] Switching between all 5 themes mid-game produces no visual artifacts on tile positions or animation state
-- [ ] Premium theme previews work even without a purchase — auto-revert after 5 seconds
-- [ ] System dark mode toggle changes the game theme immediately without app restart
+- [x] Switching between all 5 themes mid-game produces no visual artifacts on tile positions or animation state
+- [x] Premium theme previews work even without a purchase — auto-revert after 5 seconds
+- [x] System dark mode toggle changes the game theme immediately without app restart
 
 ---
 

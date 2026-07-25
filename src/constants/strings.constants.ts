@@ -77,6 +77,15 @@ export const STRINGS = {
   THEME_LAB_TITLE: 'Theme lab',
   THEME_LAB_HINT: 'Tap a theme to swap tokens live.',
   THEME_LAB_OPEN: 'Open theme lab',
+  THEME_OPEN_PICKER: 'Choose theme',
+  THEME_PREVIEW_HINT: 'Previewing premium theme…',
+  PURCHASE_THEMES_TITLE: 'Premium themes',
+  PURCHASE_THEMES_BODY:
+    'Unlock Obsidian and Ivory. This stub confirms purchase for testing until store billing ships.',
+  PURCHASE_THEMES_CONFIRM: 'Unlock themes',
+  A11Y_THEME_SELECTED: 'selected',
+  A11Y_THEME_LOCKED: 'locked, in-app purchase',
+  A11Y_THEME_APPLY: 'double tap to apply',
 
   // Statistics
   STATS_TITLE: 'Statistics',

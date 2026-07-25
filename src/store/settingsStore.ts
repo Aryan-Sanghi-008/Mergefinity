@@ -1,7 +1,7 @@
 /**
  * @file settingsStore.ts
  * @layer store
- * @description Persisted settings (haptics, sound, theme, board size) — P-08 / P-09.
+ * @description Persisted settings (haptics, sound, theme, board size) — P-08 / P-13.
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,17 +23,30 @@ export const useSettingsStore = create<SettingsStore>()(
     persist(
       analytics((set) => ({
         theme: DEFAULT_THEME_NAME,
+        followSystemDark: false,
         hapticsEnabled: true,
         soundEnabled: true,
         boardSize: BOARD_SIZE,
         setHapticsEnabled: (enabled) => set({ hapticsEnabled: enabled }),
         setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
         setTheme: (theme) => set({ theme }),
+        setFollowSystemDark: (enabled) => set({ followSystemDark: enabled }),
         setBoardSize: (boardSize) => set({ boardSize }),
       })),
       {
         name: STORAGE_KEYS.SETTINGS,
         storage: createJSONStorage(() => AsyncStorage),
+        merge: (persisted, current) => {
+          const slice = persisted as Partial<SettingsStore> | undefined;
+          if (slice === undefined || slice === null) {
+            return current;
+          }
+          return {
+            ...current,
+            ...slice,
+            followSystemDark: slice.followSystemDark ?? current.followSystemDark,
+          };
+        },
       },
     ),
     { name: 'settingsStore', enabled: __DEV__ },
