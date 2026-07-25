@@ -55,4 +55,18 @@ describe('useAchievementStore', () => {
       'unlocked',
     );
   });
+
+  it('unlockMany with empty list is a no-op', () => {
+    const before = useAchievementStore.getState().progress;
+    useAchievementStore.getState().unlockMany([]);
+    expect(useAchievementStore.getState().progress).toEqual(before);
+  });
+
+  it('resetAchievements locks every id again', () => {
+    useAchievementStore.getState().unlock('veteran');
+    useAchievementStore.getState().resetAchievements();
+    expect(useAchievementStore.getState().progress.veteran?.status).toBe(
+      'locked',
+    );
+  });
 });

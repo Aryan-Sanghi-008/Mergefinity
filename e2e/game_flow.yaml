@@ -1,0 +1,38 @@
+# Mergefinity — core game flow (P-18 Maestro)
+appId: com.mergefinity.app
+---
+- launchApp
+- assertVisible: "Mergefinity"
+# Prefer Game / Play tab if not already there
+- tapOn:
+    id: ".*Play.*"
+    optional: true
+- tapOn: "New Game"
+  optional: true
+# Five left swipes on the board
+- swipe:
+    direction: LEFT
+    duration: 300
+- swipe:
+    direction: LEFT
+    duration: 300
+- swipe:
+    direction: LEFT
+    duration: 300
+- swipe:
+    direction: LEFT
+    duration: 300
+- swipe:
+    direction: LEFT
+    duration: 300
+# Score label should remain on screen after play
+- assertVisible: "SCORE"
+# If game over appears, reset; otherwise still verify New Game works
+- tapOn:
+    text: "Try Again"
+    optional: true
+- tapOn:
+    text: "New Game"
+    optional: true
+- assertVisible: "Mergefinity"
+- assertVisible: "SCORE"

@@ -4,6 +4,7 @@
  * @description Unit tests for pure achievement unlock rules.
  */
 
+import { ACHIEVEMENT_VETERAN_GAMES } from '@/constants';
 import type { AchievementContext, Board } from '@/types';
 
 import {
@@ -65,6 +66,12 @@ describe('achievementChecks', () => {
     expect(
       checkAndUnlock(baseCtx({ maxTile: 2048, undosUsed: 1 }), []),
     ).not.toContain('purist');
+  });
+
+  it('unlocks veteran at threshold and does not double-count when already unlocked', () => {
+    const ctx = baseCtx({ totalGames: ACHIEVEMENT_VETERAN_GAMES });
+    expect(checkAndUnlock(ctx, [])).toContain('veteran');
+    expect(checkAndUnlock(ctx, ['veteran'])).not.toContain('veteran');
   });
 
   it('is idempotent when already unlocked', () => {

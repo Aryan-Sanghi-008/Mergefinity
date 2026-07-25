@@ -188,4 +188,37 @@ describe('useStatsStore', () => {
     expect(lifetime.currentWinStreak).toBe(0);
     expect(lifetime.longestWinStreak).toBe(2);
   });
+
+  it('setSessionHistory and setModesWon update slices', () => {
+    useStatsStore.getState().setSessionHistory([
+      {
+        mode: 'classic',
+        score: 10,
+        bestTile: 16,
+        durationSeconds: 30,
+        endedAt: 1,
+      },
+    ]);
+    useStatsStore.getState().setModesWon({
+      classic: true,
+      endless: false,
+      challenge: false,
+      'time-attack': false,
+    });
+    expect(useStatsStore.getState().sessionHistory).toHaveLength(1);
+    expect(useStatsStore.getState().lifetime.modesWon.classic).toBe(true);
+  });
+
+  it('recordMerges ignores empty lists and zero tiles', () => {
+    useStatsStore.getState().recordMerges('classic', []);
+    useStatsStore.getState().recordMerges('classic', [0 as CellValue, 4]);
+    expect(useStatsStore.getState().byMode.classic.totalMerges).toBe(2);
+    expect(useStatsStore.getState().lifetime.mergeHistogram[0]).toBeUndefined();
+  });
+
+  it('getBestScore reads per-mode best', () => {
+    useStatsStore.getState().recordBestScore('classic', 400);
+    expect(useStatsStore.getState().getBestScore('classic')).toBe(400);
+    expect(useStatsStore.getState().getBestScore('endless')).toBe(0);
+  });
 });

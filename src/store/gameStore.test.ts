@@ -224,4 +224,43 @@ describe('useGameStore', () => {
     expect(state.board).toHaveLength(25);
     expect(state.statsRecorded).toBe(false);
   });
+
+  it('undo is a no-op when history is empty', () => {
+    const before = useGameStore.getState().board;
+    useGameStore.getState().undo();
+    expect(useGameStore.getState().board).toEqual(before);
+    expect(useGameStore.getState().undosRemaining).toBe(MAX_UNDO_HISTORY);
+  });
+
+  it('restart preserves bestScore from stats', () => {
+    useStatsStore.getState().recordBestScore('classic', 999);
+    useGameStore.setState({ score: 50, bestScore: 999 });
+    useGameStore.getState().restart();
+    expect(useGameStore.getState().score).toBe(0);
+    expect(useGameStore.getState().bestScore).toBe(999);
+  });
+
+  it('setAnimationLock toggles animating status', () => {
+    useGameStore.getState().setAnimationLock(true);
+    expect(useGameStore.getState().status).toBe('animating');
+    expect(useGameStore.getState().animationLock).toBe(true);
+    useGameStore.getState().setAnimationLock(false);
+    expect(useGameStore.getState().status).toBe('playing');
+    expect(useGameStore.getState().animationLock).toBe(false);
+  });
+
+  it('setTimerRemainingMs updates the countdown', () => {
+    useGameStore.getState().setMode('time-attack');
+    useGameStore.getState().setTimerRemainingMs(12_000);
+    expect(useGameStore.getState().timerRemainingMs).toBe(12_000);
+  });
+
+  it('expireTimer is a no-op outside time-attack or when already terminal', () => {
+    useGameStore.getState().expireTimer();
+    expect(useGameStore.getState().status).toBe('playing');
+    useGameStore.getState().setMode('time-attack');
+    useGameStore.setState({ status: 'won', statsRecorded: true });
+    useGameStore.getState().expireTimer();
+    expect(useGameStore.getState().status).toBe('won');
+  });
 });

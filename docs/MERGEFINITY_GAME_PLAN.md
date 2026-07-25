@@ -955,7 +955,7 @@ docs/DEVICE_TEST_MATRIX.md
 
 ### Definition of Done
 
-- [ ] `npx jest` shows 100% coverage on `engine/` and 85%+ on `store/`
+- [x] `npx jest` shows 100% coverage on `engine/` and 85%+ on `store/`
 - [ ] Maestro E2E passes on all 5 device types without flakiness across 3 consecutive runs
 - [ ] TalkBack user can start a new game and identify the current score without sighted assistance
 
