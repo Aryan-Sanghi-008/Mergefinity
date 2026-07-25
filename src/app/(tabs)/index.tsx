@@ -1,30 +1,45 @@
 /**
  * @file index.tsx
  * @layer app
- * @description Game screen — thin shell pending Phase 4 organisms.
+ * @description Game screen — header + square board + controls (P-06).
  */
-import { memo, useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 
-import { STRINGS } from '@/constants';
+import { memo, useMemo } from 'react';
+import { StyleSheet, View } from 'react-native';
+
+import { GameBoard, GameControls, GameHeader } from '@/components/organisms';
+import { useDemoGame } from '@/hooks/useDemoGame';
 import { useTheme } from '@/hooks/useTheme';
-import { SPACING_TOKENS, TYPOGRAPHY, type ThemeTokens } from '@/styles';
+import { SPACING_TOKENS, type ThemeTokens } from '@/styles';
 
 /**
- * Home / game screen placeholder.
+ * Home / game screen — composes organisms; state via `useDemoGame` until P-09.
  */
 const GameScreen = memo(() => {
   const { theme } = useTheme();
+  const {
+    board,
+    score,
+    bestScore,
+    undoRemaining,
+    undoDisabled,
+    onNewGame,
+    onUndo,
+  } = useDemoGame();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title} allowFontScaling={false}>
-        {STRINGS.GAME_TITLE}
-      </Text>
-      <Text style={styles.hint} allowFontScaling={false}>
-        {STRINGS.SWIPE_HINT}
-      </Text>
+      <GameHeader score={score} bestScore={bestScore} />
+      <View style={styles.boardSlot}>
+        <GameBoard board={board} />
+      </View>
+      <GameControls
+        onNewGame={onNewGame}
+        onUndo={onUndo}
+        undoDisabled={undoDisabled}
+        undoRemaining={undoRemaining}
+      />
     </View>
   );
 });
@@ -35,19 +50,14 @@ function createStyles(theme: ThemeTokens) {
   return StyleSheet.create({
     container: {
       flex: 1,
+      flexDirection: 'column',
+      backgroundColor: theme.SURFACE,
+      paddingVertical: SPACING_TOKENS.sm,
+    },
+    boardSlot: {
+      flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: theme.SURFACE,
-      padding: SPACING_TOKENS.SCREEN_PADDING,
-    },
-    title: {
-      ...TYPOGRAPHY.title,
-      color: theme.TEXT_PRIMARY,
-      marginBottom: SPACING_TOKENS.sm,
-    },
-    hint: {
-      ...TYPOGRAPHY.body,
-      color: theme.TEXT_MUTED,
     },
   });
 }

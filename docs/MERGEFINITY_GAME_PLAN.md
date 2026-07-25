@@ -395,9 +395,9 @@ src/components/organisms/index.ts
 
 ### Definition of Done
 
-- [ ] Board renders a static initial state correctly on Pixel 4a, Samsung A52, and a 6-inch tablet
-- [ ] Tile positions are pixel-perfect — no gap inconsistencies at any screen density
-- [ ] Switching theme live repaints board without unmounting tile components (keys preserved)
+- [x] Board renders a static initial state correctly on Pixel 4a, Samsung A52, and a 6-inch tablet
+- [x] Tile positions are pixel-perfect — no gap inconsistencies at any screen density
+- [x] Switching theme live repaints board without unmounting tile components (keys preserved)
 
 ---
 

@@ -9,6 +9,7 @@ import { useWindowDimensions } from 'react-native';
 
 import { BOARD_SIZE } from '@/constants';
 import { SPACING_TOKENS } from '@/styles';
+import { getAllCellOffsets, getTileSize, type CellOffset } from '@/utils/boardLayout';
 
 /** Board layout metrics shared by CellBackground and GameBoard. */
 export interface BoardDimensions {
@@ -16,35 +17,37 @@ export interface BoardDimensions {
   boardSizePx: number;
   /** Single tile edge length. */
   tileSize: number;
-  /** Gap between tiles. */
+  /** Gap between tiles (also outer inset per P-06). */
   gap: number;
-  /** Inner board padding. */
+  /** Inner board inset — equals `gap` under the P-06 formula. */
   padding: number;
   /** Cells per axis. */
   cellCount: number;
+  /** Absolute left/top per flat index — computed once when size changes. */
+  cellOffsets: readonly CellOffset[];
 }
 
 /**
  * Computes board geometry: `boardSizePx = screenWidth - 2 × SCREEN_PADDING`.
+ * Tile positions use `left/top = (col/row × (tileSize + gap)) + gap`.
  * @param cellCount - Cells per axis (default Classic 4)
  */
 export function useBoardDimensions(cellCount: number = BOARD_SIZE): BoardDimensions {
   const { width } = useWindowDimensions();
 
   return useMemo(() => {
-    const padding = SPACING_TOKENS.BOARD_PADDING;
     const gap = SPACING_TOKENS.TILE_GAP;
     const boardSizePx = width - SPACING_TOKENS.SCREEN_PADDING * SPACING_TOKENS.LAYOUT_DOUBLE;
-    const gapsTotal = gap * (cellCount - 1);
-    const tileSize =
-      (boardSizePx - padding * SPACING_TOKENS.LAYOUT_DOUBLE - gapsTotal) / cellCount;
+    const tileSize = getTileSize(boardSizePx, cellCount, gap);
+    const cellOffsets = getAllCellOffsets(cellCount, tileSize, gap);
 
     return {
       boardSizePx,
       tileSize,
       gap,
-      padding,
+      padding: gap,
       cellCount,
+      cellOffsets,
     };
   }, [width, cellCount]);
 }
